@@ -58,8 +58,6 @@ nvim
 │   │   ├── autocmds.lua
 │   │   ├── keymaps.lua
 │   │   ├── options.lua
-│   │   ├── split.lua
-│   │   ├── splits.lua
 │   │   └── terminal.lua
 │   ├── conflict.lua
 │   ├── misc.lua
@@ -78,7 +76,7 @@ nvim
 ├── plugin_module_maps.json
 └── README.md
 
-6 directories, 26 files
+6 directories, 24 files
 ```
 
 ## 🎨 自定义

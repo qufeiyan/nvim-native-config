@@ -49,7 +49,7 @@ keymap.set('v', '<A-k>', "<cmd>m '<-2<CR>gv=gv", { desc = 'Move selection up' })
 keymap.set('n', '<C-Up>', ':resize +2<CR>', { desc = 'Increase window height' })
 keymap.set('n', '<C-Down>', ':resize -2<CR>', { desc = 'Decrease window height' })
 
-keymap.set('n', '<leader>w', '<ESC><cmd>write<CR>', { desc = 'save file' })
+keymap.set('n', '<leader>w', '<cmd>write<CR>', { desc = 'save file' })
 -- keymap.set('n', '<leader>dd', vim.diagnostic.open_float, { desc = 'diagnostic messages' })
 
 -- LSP 快捷键

@@ -20,6 +20,12 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end
 })
 
+-- Trim whitespace
+vim.api.nvim_create_user_command("TrimWhitespace", function()
+    local view = vim.fn.winsaveview()
+    vim.cmd([[%s/\s\+$//e]])
+    vim.fn.winrestview(view)
+end, {})
 
 -- Turn off paste mode when leaving insert
 vim.api.nvim_create_autocmd("InsertLeave", {
