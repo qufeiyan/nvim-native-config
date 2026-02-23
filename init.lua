@@ -1,6 +1,8 @@
 --[[
 Neovim 配置
 1. 本配置使用 Neovim 0.12 内置 API（vim.pack）进行插件管理。
+2. 实现了基本的编辑功能、LSP 支持、终端管理等功能。
+3. 实现了类似lazyvim 的评估插件加载时间的功能。
 --]]
 
 require("stats")

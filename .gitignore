@@ -2,6 +2,10 @@
 .DS_Store
 Thumbs.db
 
+# Ignore IDE files
+.vscode/
+.idea/
+
 # Ignore all files with extension
 *.log
 *.tmp
