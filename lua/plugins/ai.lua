@@ -101,15 +101,6 @@ vim.api.nvim_create_autocmd("InsertEnter", {
 vim.api.nvim_create_autocmd("BufEnter", {
     once = true,
     callback = function()
-        require("render-markdown").setup({
-            file_types = { "markdown", "Avante" },
-            ft = {
-                "markdown",
-                -- "Avante",
-                "codecompanion"
-            },
-        })
-
         ---@diagnostic disable-next-line: undefined-field
         require("codecompanion").setup({
             opts = {

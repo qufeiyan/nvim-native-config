@@ -162,7 +162,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
     callback = function()
         local stats = M.stats()
         local msg = string.format(
-            "⚡ Hikvim loaded %d/%d plugins 󰏖 in %.2fms",
+            "⚡ Neovim loaded %d/%d plugins 󰏖 in %.2fms",
             stats.loaded,
             stats.total,
             M.elapsed()

@@ -9,13 +9,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         vim.lsp.config('lua_ls', {
             settings = {
                 Lua = {
-                    runtime = { version = 'LuaJIT', path = vim.split(package.path, ';') }, -- Lua 运行时
-                    diagnostics = { globals = { 'vim' } },                                 -- 忽略全局变量 vim 的警告
+                    runtime = { version = 'LuaJIT', path = vim.split(package.path, ';') },
+                    diagnostics = { globals = { 'vim' } },
                     workspace = {
                         library = vim.api.nvim_get_runtime_file('', true),
                         checkThirdParty = false,
                     },
-                    format = { enable = true }, -- 启用格式化
+                    format = { enable = true },
                 },
             },
         })

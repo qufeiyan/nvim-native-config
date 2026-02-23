@@ -44,5 +44,6 @@
     "LuaSnip":"luasnip",
     "copilot.lua":"copilot",
     "copilot-lsp":"copilot-lsp",
-    "blink-copilot":"blink-copilot"
+    "blink-copilot":"blink-copilot",
+    "img-clip.nvim":"img-clip"
 }

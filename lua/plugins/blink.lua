@@ -44,39 +44,40 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                     draw = {
                         padding = { 0, 1 }, -- padding only on right side
                         components = {
-                            label = {
-                                kind_icon = {
-                                    text = function(ctx)
-                                        if ctx.source_name ~= "Path" then
-                                            return (require("lspkind").symbol_map[ctx.kind] or "") .. ctx.icon_gap
+                            kind_icon = {
+                                text = function(ctx)
+                                    local icon = ctx.kind_icon
+                                    if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                                        local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+                                        if dev_icon then
+                                            icon = dev_icon
                                         end
+                                    elseif icon == "" then
+                                        icon = require("lspkind").symbol_map[ctx.kind] or ""
+                                    end
+                                    -- if ctx.source_name == "copilot" then
+                                    --     icon = ""
+                                    -- end
+                                    return icon .. ctx.icon_gap
+                                end,
 
-                                        local is_unknown_type = vim.tbl_contains(
-                                            { "link", "socket", "fifo", "char", "block", "unknown" }, ctx.item.data.type)
-                                        local mini_icon, _ = require("mini.icons").get(
-                                            is_unknown_type and "os" or ctx.item.data.type,
-                                            is_unknown_type and "" or ctx.label
-                                        )
-
-                                        return (mini_icon or ctx.kind_icon) .. ctx.icon_gap
-                                    end,
-
-                                    highlight = function(ctx)
-                                        if ctx.source_name ~= "Path" then return ctx.kind_hl end
-
-                                        local is_unknown_type = vim.tbl_contains(
-                                            { "link", "socket", "fifo", "char", "block", "unknown" }, ctx.item.data.type)
-                                        local mini_icon, mini_hl = require("mini.icons").get(
-                                            is_unknown_type and "os" or ctx.item.data.type,
-                                            is_unknown_type and "" or ctx.label
-                                        )
-                                        return mini_icon ~= nil and mini_hl or ctx.kind_hl
-                                    end,
-                                },
+                                -- Optionally, use the highlight groups from nvim-web-devicons
+                                -- You can also add the same function for `kind.highlight` if you want to
+                                -- keep the highlight groups in sync with the icons.
+                                highlight = function(ctx)
+                                    local hl = ctx.kind_hl
+                                    if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                                        local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+                                        if dev_icon then
+                                            hl = dev_hl
+                                        end
+                                    end
+                                    return hl
+                                end,
                             }
                         },
-                        columns = { { "kind_icon"}, { "label", "label_description", gap = 1 }, { "source_name" } },
-                        treesitter = {'lsp'},
+                        columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
+                        treesitter = { 'lsp' },
                     },
                 },
                 ghost_text = {
@@ -189,6 +190,20 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                         },
                     },
 
+                    -- The default behavior is to only show completions from visible "normal" buffers (e.g. it wouldn't include neo-tree). This will instead show completions from all buffers, even if they're not visible on screen. Note that the performance impact of this has not been tested.
+                    buffer = {
+                        opts = {
+                            -- get all buffers, even ones like neo-tree
+                            get_bufnrs = vim.api.nvim_list_bufs
+                            -- -- or (recommended) filter to only "normal" buffers
+                            -- get_bufnrs = function()
+                            --     return vim.tbl_filter(function(bufnr)
+                            --         return vim.bo[bufnr].buftype == ''
+                            --     end, vim.api.nvim_list_bufs())
+                            -- end
+                        }
+                    },
+
                     -- Use the dictionary source
                     dictionary = {
                         name = "blink-cmp-words",
@@ -218,3 +233,4 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
         })
     end,
 })
+
