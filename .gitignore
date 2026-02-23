@@ -1,0 +1,23 @@
+# 操作系统无关文件
+.DS_Store
+Thumbs.db
+
+# Ignore all files with extension
+*.log
+*.tmp
+*.exe
+
+# Ignore directory and its contents
+node_modules/
+dist/
+build/
+# Ignore files in any directory
+**/temp/
+
+# 交换文件、备份和临时文件
+*.swp
+*.swo
+*~
+*.un~
+*.viminfo
+*.back
