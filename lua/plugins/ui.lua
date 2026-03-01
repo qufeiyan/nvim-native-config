@@ -1,15 +1,14 @@
 -- UI
 vim.pack.add({
-    { src = 'https://github.com/olimorris/onedarkpro.nvim' },
-    { src = 'https://github.com/craftzdog/solarized-osaka.nvim' },
-    { src = 'https://github.com/morhetz/gruvbox' },           -- 主题
-    { src = 'https://github.com/nvim-mini/mini.files' },      -- 文件浏览器
-    { src = 'https://github.com/nvim-mini/mini.statusline' }, -- 状态栏
-    { src = 'https://github.com/nvim-mini/mini.icons' },
-    { src = 'https://github.com/nvim-tree/nvim-web-devicons' },
+    { src = "https://github.com/olimorris/onedarkpro.nvim" },
+    { src = "https://github.com/craftzdog/solarized-osaka.nvim" },
+    { src = "https://github.com/morhetz/gruvbox" },           -- 主题
+    { src = "https://github.com/nvim-mini/mini.files" },      -- 文件浏览器
+    { src = "https://github.com/nvim-mini/mini.statusline" }, -- 状态栏
+    { src = "https://github.com/nvim-mini/mini.icons" },
+    { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     -- { src = 'https://github.com/akinsho/git-conflict.nvim',     tag = "*" },
 })
-
 
 ----------------------
 -- 颜色主题 --
@@ -29,7 +28,6 @@ vim.pack.add({
 -- })
 -- vim.cmd("colorscheme onedark")
 
--- 延迟加载 gruvbox 主题
 vim.api.nvim_create_autocmd("VimEnter", {
     once = true,
     callback = function()
@@ -41,7 +39,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
             highlights = {
                 Comment = { italic = true, extend = true },
                 Directory = { bold = true },
-                ErrorMsg = { italic = true, bold = true }
+                ErrorMsg = { italic = true, bold = true },
             },
         })
         -- vim.cmd("colorscheme gruvbox")
@@ -50,33 +48,82 @@ vim.api.nvim_create_autocmd("VimEnter", {
     end,
 })
 
-function statusline_setup()
-    local sl = require('mini.statusline')
+local attached_lsp = {}
+local copilot = nil
+local function statusline_setup()
+    local sl = require("mini.statusline")
     sl.setup({
         content = {
             -- Content for active window
             active = function()
                 local mode, mode_hl = sl.section_mode({ trunc_width = 120 })
-                local git           = sl.section_git({ trunc_width = 40 })
-                local diff          = sl.section_diff({ trunc_width = 75 })
-                local diagnostics   = sl.section_diagnostics({ trunc_width = 75 })
-                local lsp           = sl.section_lsp({ trunc_width = 75 })
-                local filename      = sl.section_filename({ trunc_width = 140 })
-                local fileinfo      = sl.section_fileinfo({ trunc_width = 120 })
-                local location      = sl.section_location({ trunc_width = 75 })
-                local search        = sl.section_searchcount({ trunc_width = 75 })
+                local git = sl.section_git({ trunc_width = 40 })
+                local diff = sl.section_diff({ trunc_width = 75 })
+                local diagnostics = sl.section_diagnostics({ trunc_width = 75 })
+                -- local lsp = sl.section_lsp({ trunc_width = 75 })
+                local filename = sl.section_filename({ trunc_width = 140 })
+                local fileinfo = sl.section_fileinfo({ trunc_width = 120 })
+                local location = sl.section_location({ trunc_width = 75 })
+                local search = sl.section_searchcount({ trunc_width = 75 })
+
+                local compute_attached_lsp = function(buf_id)
+                    local names = {}
+                    for _, server in pairs(vim.lsp.get_clients({ bufnr = buf_id })) do
+                        if server.name == "copilot" then
+                            copilot = ""
+                        else
+                            table.insert(names, server.name)
+                        end
+                    end
+
+                    local lsps = table.concat(names, ", ")
+                    -- vim.notify("lsps:" .. buf_id .. ":" .. lsps)
+                    return lsps
+                end
+                vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
+                    pattern = "*",
+                    callback = function(arg)
+                        local fn = vim.schedule_wrap(function(data)
+                            attached_lsp[data.buf] = vim.api.nvim_buf_is_valid(data.buf)
+                                and compute_attached_lsp(data.buf)
+                                or nil
+                            vim.cmd("redrawstatus")
+                        end)
+                        fn(arg)
+                        local buf = vim.api.nvim_get_current_buf()
+                        -- vim.notify("fnlsp:" .. buf .. ":" .. (attached_lsp[vim.api.nvim_get_current_buf()] or ""))
+                    end,
+                })
+
+                local section_lsp = function(args)
+                    if sl.is_truncated(args.trunc_width) then
+                        return ""
+                    end
+
+                    local attached = attached_lsp[vim.api.nvim_get_current_buf()] or ""
+
+                    if attached == "" then
+                        return ""
+                    end
+
+                    return " " .. attached
+                end
+                local lsp = section_lsp({ trunc_width = 75 })
+                vim.api.nvim_set_hl(0, "CopilotInfo", { fg = "#61AfEF" })
+                vim.api.nvim_set_hl(0, "AttachedLSPInfo", { italic = true })
 
                 -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
                 -- correct padding with spaces between groups (accounts for 'missing'
                 -- sections, etc.)
                 return sl.combine_groups({
                     { hl = mode_hl,                 strings = { mode } },
-                    { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
-                    '%<', -- Mark general truncate point
-                    { hl = 'MiniStatuslineFilename', strings = { filename } },
-                    '%=', -- End left alignment
-                    { hl = '',                       strings = { "test" } },
-                    { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+                    { hl = "MiniStatuslineDevinfo", strings = { git, diff, diagnostics } },
+                    { hl = "CopilotInfo",           strings = { copilot or "" } },
+                    "%<", -- Mark general truncate point
+                    { hl = "MiniStatuslineFilename", strings = { filename } },
+                    "%=", -- End left alignment
+                    { hl = "AttachedLSPInfo",        strings = { lsp } },
+                    { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
                     { hl = mode_hl,                  strings = { search, location } },
                 })
             end,
@@ -92,7 +139,7 @@ end
 vim.api.nvim_create_autocmd("VimEnter", {
     once = true,
     callback = function()
-        local minifiles = require('mini.files')
+        local minifiles = require("mini.files")
         minifiles.setup({
             use_as_default_explorer = true,
             windows = {
@@ -110,7 +157,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
         end, { desc = "Toggle into currently opened file" })
         -- require("mini.statusline").setup({})
         statusline_setup()
-    end
+    end,
 })
 
 -- 彩虹缩进线与括号
@@ -118,7 +165,6 @@ vim.pack.add({
     { src = "https://github.com/HiPhish/rainbow-delimiters.nvim" },
     { src = "https://github.com/lukas-reineke/indent-blankline.nvim" },
 })
-
 
 vim.api.nvim_create_autocmd({ "BufReadPost", "BUfNewFile" }, {
     once = true,
@@ -132,7 +178,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BUfNewFile" }, {
             "RainbowViolet",
             "RainbowCyan",
         }
-        local hooks = require "ibl.hooks"
+        local hooks = require("ibl.hooks")
         -- create the highlight groups in the highlight setup hook, so they are reset
         -- every time the colorscheme changes
         hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
@@ -144,7 +190,6 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BUfNewFile" }, {
             -- vim.api.nvim_set_hl(0, "RainbowViolet", { link = "RainbowDelimiterViolet" })
             -- vim.api.nvim_set_hl(0, "RainbowCyan", { link = "RainbowDelimiterCyan" })
 
-
             vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
             vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
             vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
@@ -153,27 +198,27 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BUfNewFile" }, {
             vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
             vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
         end)
-        require('rainbow-delimiters.setup').setup {
+        require("rainbow-delimiters.setup").setup({
             strategy = {
-                [''] = 'rainbow-delimiters.strategy.global',
-                vim = 'rainbow-delimiters.strategy.local',
+                [""] = "rainbow-delimiters.strategy.global",
+                vim = "rainbow-delimiters.strategy.local",
             },
             query = {
-                [''] = 'rainbow-delimiters',
-                lua = 'rainbow-blocks',
+                [""] = "rainbow-delimiters",
+                lua = "rainbow-blocks",
             },
             priority = {
-                [''] = 110,
+                [""] = 110,
                 lua = 210,
             },
             highlight = highlight,
-        }
+        })
 
         -- local indent_highlight = {
         --     "CursorColumn",
         --     "Whitespace",
         -- }
-        require("ibl").setup {
+        require("ibl").setup({
             indent = {
                 -- highlight = highlight,
                 -- char = "|"
@@ -191,10 +236,10 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BUfNewFile" }, {
                 show_start = true,
                 show_end = true,
             },
-        }
+        })
 
         hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
-    end
+    end,
 })
 
 -- fidget: lsp progress
@@ -214,14 +259,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
                     suppress_on_insert = true,   -- Suppress new messages while in insert mode
                     ignore_done_already = true,  -- Ignore new tasks that are already complete
                     ignore_empty_message = true, -- Ignore new tasks that don't contain a message
-                    clear_on_detach =            -- Clear notification group when LSP server detaches
-                        function(client_id)
-                            local client = vim.lsp.get_client_by_id(client_id)
-                            return client and client.name or nil
-                        end,
-                    notification_group = -- How to get a progress message's notification group key
-                        function(msg) return msg.lsp_client.name end,
-                    ignore = {},         -- List of LSP servers to ignore
+                    -- Clear notification group when LSP server detaches
+                    clear_on_detach = function(client_id)
+                        local client = vim.lsp.get_client_by_id(client_id)
+                        return client and client.name or nil
+                    end,
+                    -- How to get a progress message's notification group key
+                    notification_group = function(msg)
+                        return msg.lsp_client.name
+                    end,
+                    ignore = {}, -- List of LSP servers to ignore
 
                     -- Options related to how LSP progress messages are displayed as notifications
                     display = {
@@ -230,20 +277,24 @@ vim.api.nvim_create_autocmd("LspAttach", {
                         done_icon = "✔", -- Icon shown when all LSP progress tasks are complete
                         done_style = "Constant", -- Highlight group for completed LSP tasks
                         progress_ttl = math.huge, -- How long a message should persist when in progress
-                        progress_icon = -- Icon shown when LSP progress tasks are in progress
-                        { "dots" },
-                        progress_style = -- Highlight group for in-progress LSP tasks
-                        "WarningMsg",
-                        group_style = "Title", -- Highlight group for group name (LSP server name)
+                        -- Icon shown when LSP progress tasks are in progress
+                        progress_icon = { "dots" },
+                        -- Highlight group for in-progress LSP tasks
+                        progress_style = "WarningMsg",
+                        group_style = "Title",   -- Highlight group for group name (LSP server name)
                         icon_style = "Question", -- Highlight group for group icons
-                        priority = 30, -- Ordering priority for LSP notification group
-                        skip_history = true, -- Whether progress notifications should be omitted from history
-                        format_message = -- How to format a progress message
-                            require("fidget.progress.display").default_format_message,
-                        format_annote = -- How to format a progress annotation
-                            function(msg) return msg.title end,
-                        format_group_name = -- How to format a progress notification group's name
-                            function(group) return tostring(group) end,
+                        priority = 30,           -- Ordering priority for LSP notification group
+                        skip_history = true,     -- Whether progress notifications should be omitted from history
+                        -- How to format a progress message
+                        format_message = require("fidget.progress.display").default_format_message,
+                        -- How to format a progress annotation
+                        format_annote = function(msg)
+                            return msg.title
+                        end,
+                        -- How to format a progress notification group's name
+                        format_group_name = function(group)
+                            return tostring(group)
+                        end,
                         overrides = { -- Override options from the default notification config
                             rust_analyzer = { name = "rust-analyzer" },
                         },
@@ -262,14 +313,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
                     filter = vim.log.levels.INFO, -- Minimum notifications level
                     history_size = 128,           -- Number of removed messages to retain in history
                     override_vim_notify = false,  -- Automatically override vim.notify() with Fidget
-                    configs =                     -- How to configure notification groups when instantiated
-                    { default = require("fidget.notification").default_config },
-                    redirect =                    -- Conditionally redirect notifications to another backend
-                        function(msg, level, opts)
-                            if opts and opts.on_open then
-                                return require("fidget.integration.nvim-notify").delegate(msg, level, opts)
-                            end
-                        end,
+                    -- How to configure notification groups when instantiated
+                    configs = { default = require("fidget.notification").default_config },
+                    -- Conditionally redirect notifications to another backend
+                    redirect = function(msg, level, opts)
+                        if opts and opts.on_open then
+                            return require("fidget.integration.nvim-notify").delegate(msg, level, opts)
+                        end
+                    end,
 
                     -- Options related to how notifications are rendered as text
                     view = {
@@ -278,13 +329,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
                         reflow = false,          -- Reflow (wrap) messages wider than notification window
                         icon_separator = " ",    -- Separator between group name and icon
                         group_separator = "---", -- Separator between notification groups
-                        group_separator_hl =     -- Highlight group used for group separator
-                        "Comment",
-                        line_margin = 1,         -- Spaces to pad both sides of each non-empty line
-                        render_message =         -- How to render notification messages
-                            function(msg, cnt)
-                                return cnt == 1 and msg or string.format("(%dx) %s", cnt, msg)
-                            end,
+                        -- Highlight group used for group separator
+                        group_separator_hl = "Comment",
+                        line_margin = 1, -- Spaces to pad both sides of each non-empty line
+                        -- How to render notification messages
+                        render_message = function(msg, cnt)
+                            return cnt == 1 and msg or string.format("(%dx) %s", cnt, msg)
+                        end,
                     },
 
                     -- Options related to the notification window and buffer
@@ -300,7 +351,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
                         align = "bottom",      -- How to align the notification window
                         relative = "editor",   -- What the notification window position is relative to
                         tabstop = 8,           -- Width of each tab character in the notification window
-                        avoid = {}             -- Filetypes the notification window should avoid
+                        avoid = {},            -- Filetypes the notification window should avoid
                         -- e.g., { "aerial", "NvimTree", "neotest-summary" }
                     },
                 },
@@ -322,14 +373,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
                     level = vim.log.levels.WARN, -- Minimum logging level
                     max_size = 10000,            -- Maximum log file size, in KB
                     float_precision = 0.01,      -- Limit the number of decimals displayed for floats
-                    path =                       -- Where Fidget writes its logs to
-                        string.format("%s/fidget.nvim.log", vim.fn.stdpath("cache")),
+                    -- Where Fidget writes its logs to
+                    path = string.format("%s/fidget.nvim.log", vim.fn.stdpath("cache")),
                 },
-            }
+            },
         })
-    end
+    end,
 })
-
 
 -- fold
 vim.pack.add({
@@ -340,20 +390,20 @@ vim.pack.add({
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     once = true,
     callback = function()
-        vim.opt.foldcolumn = '1' -- '0' is not bad
+        vim.opt.foldcolumn = "1" -- '0' is not bad
         vim.opt.foldlevel = 99   -- Using ufo provider need a large value, feel free to decrease the value
         vim.opt.foldlevelstart = 99
         vim.opt.foldenable = true
 
         local ftMap = {
-            vim = 'indent',
-            python = { 'indent' },
-            git = ''
+            vim = "indent",
+            python = { "indent" },
+            git = "",
         }
 
         local handler = function(virtText, lnum, endLnum, width, truncate)
             local newVirtText = {}
-            local suffix = (' 󰁂 %d '):format(endLnum - lnum)
+            local suffix = (" 󰁂 %d "):format(endLnum - lnum)
             local sufWidth = vim.fn.strdisplaywidth(suffix)
             local targetWidth = width - sufWidth
             local curWidth = 0
@@ -369,13 +419,13 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
                     chunkWidth = vim.fn.strdisplaywidth(chunkText)
                     -- str width returned from truncate() may less than 2nd argument, need padding
                     if curWidth + chunkWidth < targetWidth then
-                        suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
+                        suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
                     end
                     break
                 end
                 curWidth = curWidth + chunkWidth
             end
-            table.insert(newVirtText, { suffix, 'MoreMsg' })
+            table.insert(newVirtText, { suffix, "MoreMsg" })
             return newVirtText
         end
 
@@ -387,55 +437,53 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
         -- local bufnr = vim.api.nvim_get_current_buf()
         -- ufo.setFoldVirtTextHandler(bufnr, handler)
 
-        local ufo = require('ufo')
+        local ufo = require("ufo")
         ufo.setup({
             open_fold_hl_timeout = 150,
             close_fold_kinds_for_ft = {
-                default = { 'imports', 'comment' },
+                default = { "imports", "comment" },
                 -- json = { 'array' },
-                c = { 'comment', 'region' }
+                c = { "comment", "region" },
             },
             close_fold_current_line_for_ft = {
                 default = true,
-                c = false
+                c = false,
             },
             preview = {
                 win_config = {
-                    border = { '', '─', '', '', '', '─', '', '' },
-                    winhighlight = 'Normal:Folded',
-                    winblend = 0
+                    border = { "", "─", "", "", "", "─", "", "" },
+                    winhighlight = "Normal:Folded",
+                    winblend = 0,
                 },
                 mappings = {
-                    scrollU = '<C-u>',
-                    scrollD = '<C-d>',
-                    jumpTop = '[',
-                    jumpBot = ']'
-                }
+                    scrollU = "<C-u>",
+                    scrollD = "<C-d>",
+                    jumpTop = "[",
+                    jumpBot = "]",
+                },
             },
             ---@diagnostic disable-next-line: unused-local
             provider_selector = function(bufnr, filetype, buftype)
                 -- if you prefer treesitter provider rather than lsp,
-                return ftMap[filetype] or { 'treesitter', 'indent' }
+                return ftMap[filetype] or { "treesitter", "indent" }
                 -- return ftMap[filetype]
 
                 -- refer to ./doc/example.lua for detail
             end,
-            fold_virt_text_handler = handler
-
+            fold_virt_text_handler = handler,
         })
-        vim.keymap.set('n', 'zR', ufo.openAllFolds)
-        vim.keymap.set('n', 'zM', ufo.closeAllFolds)
-        vim.keymap.set('n', 'zr', ufo.openFoldsExceptKinds)
-        vim.keymap.set('n', 'zm', ufo.closeFoldsWith) -- closeAllFolds == closeFoldsWith(0)
-        vim.keymap.set('n', 'zk', function()
+        vim.keymap.set("n", "zR", ufo.openAllFolds)
+        vim.keymap.set("n", "zM", ufo.closeAllFolds)
+        vim.keymap.set("n", "zr", ufo.openFoldsExceptKinds)
+        vim.keymap.set("n", "zm", ufo.closeFoldsWith) -- closeAllFolds == closeFoldsWith(0)
+        vim.keymap.set("n", "zk", function()
             ufo.peekFoldedLinesUnderCursor()
         end, { desc = "Peek fold" })
     end,
 })
 
-
 vim.pack.add({
-    { src = "https://github.com/catgoose/nvim-colorizer.lua" }
+    { src = "https://github.com/catgoose/nvim-colorizer.lua" },
 })
 
 vim.api.nvim_create_autocmd("BufFilePost", {
@@ -498,7 +546,7 @@ vim.api.nvim_create_autocmd("BufFilePost", {
                 },
             },
         })
-    end
+    end,
 })
 
 vim.pack.add({
@@ -538,16 +586,16 @@ vim.api.nvim_create_autocmd("VimEnter", {
                 },
                 auto_restore_last_session = true,
                 suppressed_dirs = { "~/", "~/Dev", "~/Documents", "~/Desktop", "~/Projects", "~/Downloads", "/" },
-            }
+            },
         })
         vim.keymap.set("n", "<leader>sr", ":AutoSession search<CR>", { desc = "Session search" })
         vim.keymap.set("n", "<leader>ss", ":AutoSession save<CR>", { desc = "Save Session" })
         vim.keymap.set("n", "<leader>sa", ":AutoSession toggle<CR>", { desc = "Toggle Session" })
-    end
+    end,
 })
 
 vim.pack.add({
-    { src = "https://github.com/stevearc/aerial.nvim" }
+    { src = "https://github.com/stevearc/aerial.nvim" },
 })
 
 vim.api.nvim_create_autocmd("User", {

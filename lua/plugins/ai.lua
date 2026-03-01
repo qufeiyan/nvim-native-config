@@ -1,49 +1,13 @@
 vim.pack.add({
     { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
-    { src = "https://github.com/copilotlsp-nvim/copilot-lsp" },
     { src = "https://github.com/zbirenbaum/copilot.lua" },
     { src = "https://github.com/olimorris/codecompanion.nvim" },
 })
 
-local function copilot_lsp_setup()
-    vim.g.copilot_nes_debounce = 500
-    vim.lsp.enable("copilot_ls")
-    vim.keymap.set("n", "<tab>", function()
-        local bufnr = vim.api.nvim_get_current_buf()
-        local state = vim.b[bufnr].nes_state
-        if state then
-            -- Try to jump to the start of the suggestion edit.
-            -- If already at the start, then apply the pending suggestion and jump to the end of the edit. 
-            local _ = require("copilot-lsp.nes").walk_cursor_start_edit()
-                or (
-                    require("copilot-lsp.nes").apply_pending_nes()
-                    and require("copilot-lsp.nes").walk_cursor_end_edit()
-                )
-            return nil
-        else
-            -- Resolving the terminal's inability to distinguish between `TAB` and `<C-i>` in normal mode
-            return "<C-i>"
-        end
-    end, { desc = "Accept Copilot NES suggestion", expr = true })
-    -- Clear copilot suggestion with Esc if visible, otherwise preserve default Esc behavior
-    vim.keymap.set("n", "<esc>", function()
-        if not require("copilot-lsp.nes").clear() then
-            -- fallback to other functionality
-        end
-    end, { desc = "Clear Copilot suggestion or fallback" })
-
-    require('copilot-lsp').setup({
-        nes = {
-            move_count_threshold = 3, -- Clear after 3 cursor movements
-        }
-    })
-end
-
 local function copilot_setup()
-    copilot_lsp_setup()
     ---@diagnostic disable-next-line: redundant-parameter
-    require('copilot').setup({
+    require("copilot").setup({
         panel = {
             enabled = true,
             auto_refresh = false,
@@ -52,11 +16,11 @@ local function copilot_setup()
                 jump_next = "]]",
                 accept = "<CR>",
                 refresh = "gr",
-                open = "<M-CR>"
+                open = "<M-CR>",
             },
             layout = {
                 position = "bottom", -- | top | left | right | bottom |
-                ratio = 0.4
+                ratio = 0.4,
             },
         },
         suggestion = {
@@ -95,7 +59,7 @@ vim.api.nvim_create_autocmd("InsertEnter", {
     once = true,
     callback = function()
         copilot_setup()
-    end
+    end,
 })
 
 vim.api.nvim_create_autocmd("BufEnter", {
@@ -168,13 +132,12 @@ vim.api.nvim_create_autocmd("BufEnter", {
 
             interactions = {
                 -- chat = { adapter = "openrouter_claude" },
-                chat = { 
+                chat = {
                     adapter = "deepseek",
                 },
                 inline = { adapter = "copilot" },
-                cmd = {adapter = "deepseek"},
+                cmd = { adapter = "deepseek" },
             },
-
         })
-    end
+    end,
 })

@@ -14,15 +14,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         -- [inlay hint]
         if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            vim.keymap.set('n', '<leader>th', function()
-                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, { buffer = event.buf, desc = 'LSP: Toggle Inlay Hints' })
+            vim.keymap.set("n", "<leader>th", function()
+                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
+            end, { buffer = event.buf, desc = "LSP: Toggle Inlay Hints" })
         end
 
         -- [folding]
-        if client and client:supports_method 'textDocument/foldingRange' then
+        if client and client:supports_method("textDocument/foldingRange") then
             local win = vim.api.nvim_get_current_win()
-            vim.wo[win][0].foldexpr = 'v:lua.vim.lsp.foldexpr()'
+            vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
         end
 
         -- [keymaps]
@@ -49,7 +49,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
             -- Mimic tmux formula: 8 * width - 20 * height
             local value = 8 * width - 20 * height
             if value < 0 then
-                vim.cmd("split")  -- vertical space is more: horizontal split
+                vim.cmd("split") -- vertical space is more: horizontal split
             else
                 vim.cmd("vsplit") -- horizontal space is more: vertical split
             end
@@ -60,7 +60,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
         local function jump_to_current_function_start()
             local params = { textDocument = vim.lsp.util.make_text_document_params() }
             local responses = vim.lsp.buf_request_sync(0, "textDocument/documentSymbol", params, 1000)
-            if not responses then return end
+            if not responses then
+                return
+            end
 
             local pos = vim.api.nvim_win_get_cursor(0)
             local line = pos[1] - 1
@@ -71,7 +73,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
                     if range and line >= range.start.line and line <= range["end"].line then
                         if s.children then
                             local child = find_symbol(s.children)
-                            if child then return child end
+                            if child then
+                                return child
+                            end
                         end
                         return s
                     end
@@ -90,7 +94,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
         local function jump_to_current_function_end()
             local params = { textDocument = vim.lsp.util.make_text_document_params() }
             local responses = vim.lsp.buf_request_sync(0, "textDocument/documentSymbol", params, 1000)
-            if not responses then return end
+            if not responses then
+                return
+            end
 
             local pos = vim.api.nvim_win_get_cursor(0)
             local line = pos[1] - 1
@@ -101,7 +107,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
                     if range and line >= range.start.line and line <= range["end"].line then
                         if s.children then
                             local child = find_symbol(s.children)
-                            if child then return child end
+                            if child then
+                                return child
+                            end
                         end
                         return s
                     end
@@ -156,7 +164,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
-
 -- 定义检测并清理超大 LSP 日志的命令
 vim.api.nvim_create_user_command("LspLogClean", function()
     local lsp_log_path = vim.fn.stdpath("log") .. "/lsp.log"
@@ -173,15 +180,9 @@ vim.api.nvim_create_user_command("LspLogClean", function()
     if file_size_mb >= max_size_mb then
         -- 删除超大日志文件
         vim.fn.delete(lsp_log_path)
-        vim.notify(
-            string.format("LSP 日志文件过大（%.1fMB），已删除", file_size_mb),
-            vim.log.levels.WARN
-        )
+        vim.notify(string.format("LSP 日志文件过大（%.1fMB），已删除", file_size_mb), vim.log.levels.WARN)
     else
-        vim.notify(
-            string.format("LSP 日志文件大小正常（%.1fMB）", file_size_mb),
-            vim.log.levels.INFO
-        )
+        vim.notify(string.format("LSP 日志文件大小正常（%.1fMB）", file_size_mb), vim.log.levels.INFO)
     end
 end, { desc = "检测 LSP 日志大小，超过 250MB 则删除" })
 
