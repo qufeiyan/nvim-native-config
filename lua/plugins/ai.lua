@@ -14,7 +14,7 @@ local function copilot_lsp_setup()
         local state = vim.b[bufnr].nes_state
         if state then
             -- Try to jump to the start of the suggestion edit.
-            -- If already at the start, then apply the pending suggestion and jump to the end of the edit.
+            -- If already at the start, then apply the pending suggestion and jump to the end of the edit. 
             local _ = require("copilot-lsp.nes").walk_cursor_start_edit()
                 or (
                     require("copilot-lsp.nes").apply_pending_nes()
@@ -131,14 +131,14 @@ vim.api.nvim_create_autocmd("BufEnter", {
                         return require("codecompanion.adapters").extend("openai_compatible", {
                             name = "deepseek",
                             env = {
-                                url = "http://lanz.hikvision.com/v3/openai/deepseek-v3",
+                                url = "https://api.deepseek.com",
                                 api_key = function()
-                                    return os.getenv("DEEPSEEK_API_KEY")
+                                    return os.getenv("DS_API_KEY")
                                 end,
                             },
                             schema = {
                                 model = {
-                                    default = "deepseek-v3",
+                                    default = "deepseek-chat",
                                 },
                             },
                         })
@@ -147,111 +147,32 @@ vim.api.nvim_create_autocmd("BufEnter", {
                     deepseek_r1 = function()
                         return require("codecompanion.adapters").extend("deepseek", {
                             name = "deepseek-r1",
-                            url = "http://lanz.hikvision.com/v3/openai/deepseek-v3",
+                            url = "https://api.deepseek.com",
                             env = {
                                 api_key = function()
-                                    return os.getenv("DEEPSEEK_API_KEY")
+                                    return os.getenv("DS_API_KEY")
                                 end,
                             },
                             schema = {
                                 model = {
-                                    default = "deepseek-r1",
+                                    default = "deepseek-reasoner",
                                     choices = {
-                                        ["deepseek-r1"] = { opts = { can_reason = true } },
+                                        ["deepseek-reasoner"] = { opts = { can_reason = true } },
                                     },
                                 },
                             },
                         })
                     end,
-
-                    qwen = function()
-                        return require("codecompanion.adapters").extend("openai_compatible", {
-                            name = "qwen",
-                            env = {
-                                url = "http://lanz.hikvision.com/v3/openai/model",
-                                api_key = function()
-                                    return os.getenv("LANZ_API_KEY")
-                                end,
-                            },
-                            schema = {
-                                model = {
-                                    default = "Qwen3-Coder-480B",
-                                },
-                            },
-                        })
-                    end,
-
-                    glm = function()
-                        return require("codecompanion.adapters").extend("openai_compatible", {
-                            name = "glm4.7",
-                            env = {
-                                url = "http://lanz.hikvision.com/v3/openai/model",
-                                api_key = function()
-                                    return os.getenv("LANZ_API_KEY")
-                                end,
-                                -- chat_url = "/v1/chat/completions",
-                                -- api_key = "sk-8bdbc3ab5b1b4d16929db0285d14f556",
-                            },
-                            schema = {
-                                model = {
-                                    default = "GLM-4.7",
-                                },
-                            },
-                        })
-                    end,
-
-                    -- Qwen2.5-Coder
-                    cmp = function()
-                        return require("codecompanion.adapters").extend("openai_compatible", {
-                            name = "glm4.7",
-                            env = {
-                                url = "http://lanz.hikvision.com/v3/openai/model",
-                                api_key = function()
-                                    return os.getenv("LANZ_API_KEY")
-                                end,
-                                -- chat_url = "/v1/chat/completions",
-                                -- api_key = "sk-8bdbc3ab5b1b4d16929db0285d14f556",
-                            },
-                            schema = {
-                                model = {
-                                    default = "Qwen2.5-Coder",
-                                },
-                            },
-                        })
-                    end,
                 },
-                -- acp = {
-                --     gemini_cli = function()
-                --         return require("codecompanion.adapters").extend("gemini_cli", {
-                --             commands = {
-                --                 flash = {
-                --                     "gemini",
-                --                     "--experimental-acp",
-                --                     "-m",
-                --                     "gemini-2.5-flash",
-                --                 },
-                --                 pro = {
-                --                     "gemini",
-                --                     "--experimental-acp",
-                --                     "-m",
-                --                     "gemini-2.5-pro",
-                --                 },
-                --             },
-                --             defaults = {
-                --                 auth_method = "gemini-api-key", -- "oauth-personal" | "gemini-api-key" | "vertex-ai"
-                --                 -- auth_method = "oauth-personal",
-                --                 -- auth_method = "vertex-ai",
-                --             },
-                --         })
-                --     end,
-                -- },
             },
-
 
             interactions = {
                 -- chat = { adapter = "openrouter_claude" },
-                chat = { adapter = "qwen" },
-                inline = { adapter = "cmp" },
+                chat = { 
+                    adapter = "deepseek",
+                },
+                inline = { adapter = "copilot" },
+                cmd = {adapter = "deepseek"},
             },
 
         })

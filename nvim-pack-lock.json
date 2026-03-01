@@ -16,6 +16,10 @@
       "rev": "476f342fe6bc1e120ba3e334b5d9cf3ef66de56a",
       "src": "https://github.com/yetone/avante.nvim"
     },
+    "blink-cmp-avante": {
+      "rev": "4f494c6e124acbe31a8f5d58effa0c14aa38a6d5",
+      "src": "https://github.com/Kaiser-Yang/blink-cmp-avante"
+    },
     "blink-cmp-words": {
       "rev": "d6a56f532a1826b4f3aeed4d5e2fe7b8743a9244",
       "src": "https://github.com/archie-judd/blink-cmp-words"
@@ -56,6 +60,14 @@
     "friendly-snippets": {
       "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
       "src": "https://github.com/rafamadriz/friendly-snippets.git"
+    },
+    "git-conflict.nvim": {
+      "rev": "a1badcd070d176172940eb55d9d59029dad1c5a6",
+      "src": "https://github.com/akinsho/git-conflict.nvim"
+    },
+    "gitsigns.nvim": {
+      "rev": "9f3c6dd7868bcc116e9c1c1929ce063b978fa519",
+      "src": "git@github.com:lewis6991/gitsigns.nvim.git"
     },
     "gruvbox": {
       "rev": "697c00291db857ca0af00ec154e5bd514a79191f",
@@ -108,6 +120,10 @@
     "nui.nvim": {
       "rev": "de740991c12411b663994b2860f1a4fd0937c130",
       "src": "https://github.com/MunifTanjim/nui.nvim"
+    },
+    "nvim": {
+      "rev": "193e123cdbc4dd3e86db883d55349e9587f0ded6",
+      "src": "https://github.com/catppuccin/nvim"
     },
     "nvim-autopairs": {
       "rev": "7a2c97cccd60abc559344042fefb1d5a85b3e33b",
@@ -184,6 +200,10 @@
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "https://github.com/folke/todo-comments.nvim"
+    },
+    "tokyonight.nvim": {
+      "rev": "5da1b76e64daf4c5d410f06bcb6b9cb640da7dfd",
+      "src": "https://github.com/folke/tokyonight.nvim"
     },
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",

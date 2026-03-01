@@ -18,7 +18,6 @@
     "mini.statusline":"mini.statusline",
     "nui.nvim":"nui.nvim",
     "nvim-autopairs":"nvim-autopairs",
-    "nvim-cmp":"nvim-cmp",
     "nvim-colorizer.lua":"colorizer",
     "nvim-lspconfig":"nvim-lspconfig",
     "nvim-surround":"nvim-surround",
