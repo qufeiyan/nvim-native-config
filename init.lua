@@ -14,7 +14,7 @@ require("plugins.treesitter")
 require("plugins.ui")
 require("plugins.blink")
 -- 加载终端管理模块
-require("config.terminal").setup()
+-- require("config.terminal").setup()
 require("plugins.lsp")
 require("plugins.editor")
 require("plugins.snippet")

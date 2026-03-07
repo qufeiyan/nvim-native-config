@@ -68,7 +68,7 @@ require("snacks").setup({
                     icon = " ",
                     key = "c",
                     desc = "Config files",
-                    action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })"
+                    action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })",
                 },
                 { icon = "󰒲 ", key = "L", desc = "Lazy", action = ":Lazy", enabled = package.loaded.lazy ~= nil },
                 {
@@ -82,23 +82,14 @@ require("snacks").setup({
                 { icon = " ", key = "q", desc = "Quit", action = ":qa" },
             },
             header = [[
-██╗   ██╗██╗███╗   ███╗ ██████╗ ██████╗ ██████╗ ███████╗
-██║   ██║██║████╗ ████║██╔════╝██╔═══██╗██╔══██╗██╔════╝
-██║   ██║██║██╔████╔██║██║     ██║   ██║██║  ██║█████╗  
-╚██╗ ██╔╝██║██║╚██╔╝██║██║     ██║   ██║██║  ██║██╔══╝  
- ╚████╔╝ ██║██║ ╚═╝ ██║╚██████╗╚██████╔╝██████╔╝███████╗
-  ╚═══╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝
-Not a bug, but a feature!
+            ██╗  ██╗██╗██╗  ██╗██╗   ██╗██╗███╗   ███╗
+            ██║  ██║██║██║ ██╔╝██║   ██║██║████╗ ████║
+            ███████║██║█████╔╝ ██║   ██║██║██╔████╔██║
+            ██╔══██║██║██╔═██╗ ╚██╗ ██╔╝██║██║╚██╔╝██║
+            ██║  ██║██║██║  ██╗ ╚████╔╝ ██║██║ ╚═╝ ██║
+            ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═╝     ╚═╝
+            Not a bug, but a feature!
             ]],
---             header = [[
--- ██╗  ██╗██╗██╗  ██╗██╗   ██╗██╗███╗   ███╗
--- ██║  ██║██║██║ ██╔╝██║   ██║██║████╗ ████║
--- ███████║██║█████╔╝ ██║   ██║██║██╔████╔██║
--- ██╔══██║██║██╔═██╗ ╚██╗ ██╔╝██║██║╚██╔╝██║
--- ██║  ██║██║██║  ██╗ ╚████╔╝ ██║██║ ╚═╝ ██║
--- ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═╝     ╚═╝
--- Not a bug, but a feature!
--- ]],
         },
         sections = {
             { section = "header" },
@@ -139,7 +130,7 @@ Not a bug, but a feature!
                 "RainbowDelimiterViolet",
                 "RainbowDelimiterCyan",
             },
-            priority = 1000
+            priority = 1000,
         },
         chunk = {
             enabled = true,
@@ -294,20 +285,35 @@ map("<leader>Z", function()
     Snacks.zen.zoom()
 end, "Toggle Zoom")
 
-map("<leader>e", function() Snacks.explorer() end, "File Explorer")
-map("<leader>:", function() Snacks.picker.command_history() end, "Command History")
-map("<leader>/", function() Snacks.picker.commands() end, "Commands")
+map("<leader>e", function()
+    Snacks.explorer()
+end, "File Explorer")
+map("<leader>:", function()
+    Snacks.picker.command_history()
+end, "Command History")
+map("<leader>/", function()
+    Snacks.picker.commands()
+end, "Commands")
 map("<leader>`", ":lua Snacks.terminal()<CR>", "Toggle Terminal")
 
-map("<leader>fC", function() Snacks.picker.colorschemes() end, "Find colorschemes")
-map("<leader>fu", function() Snacks.picker.undo() end, "Find undo history")
-map("<leader>fq", function() Snacks.picker.qflist() end, "Quickfix List")
+map("<leader>fC", function()
+    Snacks.picker.colorschemes()
+end, "Find colorschemes")
+map("<leader>fu", function()
+    Snacks.picker.undo()
+end, "Find undo history")
+map("<leader>fq", function()
+    Snacks.picker.qflist()
+end, "Quickfix List")
 
-vim.keymap.set('n', '<leader>n', '<C-\\><C-n>:lua Snacks.terminal.open()<CR>',
-    { desc = '打开/隐藏终端' })
+vim.keymap.set("n", "<leader>gg", "<cmd>lua Snacks.lazygit()<CR>", { desc = "Open lazygit" })
+
+vim.keymap.set("n", "<leader>n", "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>", { desc = "打开终端" })
+vim.keymap.set("t", "<C-j>", "<C-\\><C-n>:lua Snacks.terminal.open()<CR>", { desc = "打开新终端" })
+vim.keymap.set("t", "<C-w>h", "<C-\\><C-n><C-w>h", { desc = "切到前一个终端" })
+vim.keymap.set("t", "<C-w>l", "<C-\\><C-n><C-w>l", { desc = "切到后一个终端" })
 -- 终端模式快捷键（使用 <C-\><C-n> 退出插入模式后执行命令）
-vim.keymap.set('n', '<leader>`', '<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>',
-    { desc = '打开/隐藏终端' })
+vim.keymap.set("t", "<C-t><C-t>", "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>", { desc = "打开/隐藏终端" })
 
 -- vim.keymap.set({ 'n', 't' }, '<C-t>', function()
 --     Snacks.terminal.toggle()
@@ -321,4 +327,4 @@ vim.keymap.set('n', '<leader>`', '<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>',
 
 -- align to vscode
 -- map('<C-S-;>', Snacks.picker.lsp_workspace_symbols, 'Find workspace symbols')
-map('<C-S-o>', Snacks.picker.lsp_symbols, 'Find workspace symbols')
+map("<C-S-o>", Snacks.picker.lsp_symbols, "Find workspace symbols")
