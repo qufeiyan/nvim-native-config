@@ -2,7 +2,7 @@
 vim.pack.add({
     { src = "https://github.com/olimorris/onedarkpro.nvim" },
     { src = "https://github.com/craftzdog/solarized-osaka.nvim" },
-    { src = "https://github.com/morhetz/gruvbox" },           -- 主题
+    { src = "https://github.com/ellisonleao/gruvbox.nvim" },
     { src = "https://github.com/nvim-mini/mini.files" },      -- 文件浏览器
     { src = "https://github.com/nvim-mini/mini.statusline" }, -- 状态栏
     { src = "https://github.com/nvim-mini/mini.icons" },
@@ -13,41 +13,54 @@ vim.pack.add({
 ----------------------
 -- 颜色主题 --
 ----------------------
+-- Default options:
+require("gruvbox").setup({
+    terminal_colors = true, -- add neovim terminal colors
+    undercurl = true,
+    underline = true,
+    bold = true,
+    italic = {
+        strings = true,
+        emphasis = true,
+        comments = true,
+        operators = false,
+        folds = true,
+    },
+    strikethrough = true,
+    invert_selection = false,
+    invert_signs = false,
+    invert_tabline = false,
+    inverse = true, -- invert background for search, diffs, statuslines and errors
+    contrast = "",  -- can be "hard", "soft" or empty string
+    palette_overrides = {},
+    overrides = {
+        Pmenu = { link = "Normal" },
+    },
+    dim_inactive = false,
+    transparent_mode = true,
+})
+vim.cmd("colorscheme gruvbox")
 -- require('solarized-osaka').setup({
 --     priority = 1000,
 --     options = {
 --         transparent = true,
 --     }
 -- })
+-- vim.cmd("colorscheme solarized-osaka")
 
 -- require("onedarkpro").setup({
 --     options = {
 --         transparency = true,
---         highlight_inactive_windows = true
---     }
+--         highlight_inactive_windows = true,
+--     },
+--     highlights = {
+--         Comment = { italic = true, extend = true },
+--         Directory = { bold = true },
+--         ErrorMsg = { italic = true, bold = true },
+--     },
 -- })
 -- vim.cmd("colorscheme onedark")
-
-vim.api.nvim_create_autocmd("VimEnter", {
-    once = true,
-    callback = function()
-        require("onedarkpro").setup({
-            options = {
-                transparency = true,
-                highlight_inactive_windows = true,
-            },
-            highlights = {
-                Comment = { italic = true, extend = true },
-                Directory = { bold = true },
-                ErrorMsg = { italic = true, bold = true },
-            },
-        })
-        -- vim.cmd("colorscheme gruvbox")
-        -- vim.cmd("colorscheme solarized-osaka")
-        vim.cmd("colorscheme onedark")
-    end,
-})
-
+--
 local attached_lsp = {}
 local copilot = nil
 local function statusline_setup()
