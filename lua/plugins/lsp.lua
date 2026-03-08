@@ -1,11 +1,17 @@
 vim.pack.add({
-    -- { src = "https://github.com/mason-org/mason.nvim" },
+    { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/neovim/nvim-lspconfig" },
 })
 
--- LSP 诊断显示
--- vim.diagnostic.config({ virtual_text = false }) -- 行内文本提示
--- vim.diagnostic.config({ virtual_lines = true }) -- 虚拟行提示（可选）
+require("mason").setup({
+    ui = {
+        icons = {
+            package_installed = "✓",
+            package_pending = "➜",
+            package_uninstalled = "✗",
+        },
+    },
+})
 
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("SetupLSP", {}),
@@ -27,7 +33,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         -- [keymaps]
         vim.keymap.set({ "n", "x" }, "<leader>lf", vim.lsp.buf.format, { desc = "format document/selection" })
-        vim.keymap.set({ "n", "x" }, "<leader>lc", function()
+        vim.keymap.set({ "n", "x" }, "<leader>la", function()
             vim.lsp.buf.code_action()
         end, { desc = "Lsp code action" })
         vim.keymap.set("n", "gh", vim.lsp.buf.hover, { desc = "Lsp hover" })
@@ -49,7 +55,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
             -- Mimic tmux formula: 8 * width - 20 * height
             local value = 8 * width - 20 * height
             if value < 0 then
-                vim.cmd("split") -- vertical space is more: horizontal split
+                vim.cmd("split")  -- vertical space is more: horizontal split
             else
                 vim.cmd("vsplit") -- horizontal space is more: vertical split
             end
