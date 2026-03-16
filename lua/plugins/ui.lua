@@ -204,11 +204,11 @@ local function statusline_setup()
                         return ""
                     end
 
-                    return " " .. attached
+                    return " " .. attached
                 end
                 local lsp = section_lsp({ trunc_width = 75 })
                 vim.api.nvim_set_hl(0, "CopilotInfo", { fg = "#61AfEF" })
-                vim.api.nvim_set_hl(0, "AttachedLSPInfo", { italic = true })
+                vim.api.nvim_set_hl(0, "AttachedLSPInfo", { fg = "#d3869b", italic = true })
 
                 -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
                 -- correct padding with spaces between groups (accounts for 'missing'
