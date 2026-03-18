@@ -80,7 +80,7 @@ local function noice_setup()
             command_palette = true,       -- position the cmdline and popupmenu together
             long_message_to_split = true, -- long messages will be sent to a split
             inc_rename = false,           -- enables an input dialog for inc-rename.nvim
-            lsp_doc_border = false,       -- add a border to hover docs and signature help
+            lsp_doc_border = true,        -- add a border to hover docs and signature help
         },
         -- Position the command popup at the center of the screen
         -- See https://github.com/folke/noice.nvim/blob/0cbe3f88d038320bdbda3c4c5c95f43a13c3aa12/lua/noice/types/nui.lua#L6
@@ -96,46 +96,8 @@ local function noice_setup()
                     col = "50%",
                 },
                 size = {
-                    width = 80,
+                    width = "auto",
                     height = "auto",
-                },
-                win_options = {
-                    winhighlight = {
-                        Normal = "NoiceCmdlinePopup",
-                        FloatTitle = "NoiceCmdlinePopupTitle",
-                        FloatBorder = "NoiceCmdlinePopupBorder",
-                        IncSearch = "",
-                        CurSearch = "",
-                        Search = "",
-                    },
-                    winbar = "",
-                    foldenable = false,
-                    cursorline = false,
-                },
-            },
-            popupmenu = {
-                -- relative = 'editor', -- "'cursor'"|"'editor'"|"'win'"
-                position = {
-                    row = "auto", -- Popup will show up below the cmdline automatically
-                    col = "auto",
-                },
-                size = {
-                    width = 80, -- Making this as wide as the cmdline_popup
-                    height = "auto",
-                },
-                border = {
-                    ---@type _.NuiBorderStyle
-                    style = "double", -- 'double'"|"'none'"|"'rounded'"|"'shadow'"|"'single'"|"'solid'
-                    ---@type _.NuiBorderPadding
-                    padding = { 0, 1 },
-                },
-                win_options = {
-                    winhighlight = {
-                        Normal = "NoicePopupmenu",            -- Normal | NoicePopupmenu
-                        FloatBorder = "NoicePopupmenuBorder", -- DiagnosticInfo | NoicePopupmenuBorder
-                        CursorLine = "NoicePopupmenuSelected",
-                        PmenuMatch = "NoicePopupmenuMatch",
-                    },
                 },
             },
         },
@@ -148,6 +110,32 @@ end
 local function statusline_setup()
     local attached_lsp = {}
     local copilot = nil
+    local compute_attached_lsp = function(buf_id)
+        local names = {}
+        for _, server in pairs(vim.lsp.get_clients({ bufnr = buf_id })) do
+            if server.name == "copilot" then
+                copilot = ""
+            else
+                table.insert(names, server.name)
+            end
+        end
+
+        local lsps = table.concat(names, ", ")
+        -- vim.notify("lsps:" .. buf_id .. ":" .. lsps)
+        return lsps
+    end
+    vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
+        pattern = "*",
+        callback = function(arg)
+            local fn = vim.schedule_wrap(function(data)
+                attached_lsp[data.buf] = vim.api.nvim_buf_is_valid(data.buf) and compute_attached_lsp(data.buf) or nil
+                vim.cmd("redrawstatus")
+            end)
+            fn(arg)
+            local buf = vim.api.nvim_get_current_buf()
+            -- vim.notify("fnlsp:" .. buf .. ":" .. (attached_lsp[vim.api.nvim_get_current_buf()] or ""))
+        end,
+    })
 
     local sl = require("mini.statusline")
     sl.setup({
@@ -164,35 +152,6 @@ local function statusline_setup()
                 local location = sl.section_location({ trunc_width = 75 })
                 local search = sl.section_searchcount({ trunc_width = 75 })
 
-                local compute_attached_lsp = function(buf_id)
-                    local names = {}
-                    for _, server in pairs(vim.lsp.get_clients({ bufnr = buf_id })) do
-                        if server.name == "copilot" then
-                            copilot = ""
-                        else
-                            table.insert(names, server.name)
-                        end
-                    end
-
-                    local lsps = table.concat(names, ", ")
-                    -- vim.notify("lsps:" .. buf_id .. ":" .. lsps)
-                    return lsps
-                end
-                vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
-                    pattern = "*",
-                    callback = function(arg)
-                        local fn = vim.schedule_wrap(function(data)
-                            attached_lsp[data.buf] = vim.api.nvim_buf_is_valid(data.buf)
-                                and compute_attached_lsp(data.buf)
-                                or nil
-                            vim.cmd("redrawstatus")
-                        end)
-                        fn(arg)
-                        local buf = vim.api.nvim_get_current_buf()
-                        -- vim.notify("fnlsp:" .. buf .. ":" .. (attached_lsp[vim.api.nvim_get_current_buf()] or ""))
-                    end,
-                })
-
                 local section_lsp = function(args)
                     if sl.is_truncated(args.trunc_width) then
                         return ""
@@ -206,6 +165,7 @@ local function statusline_setup()
 
                     return " " .. attached
                 end
+
                 local lsp = section_lsp({ trunc_width = 75 })
                 vim.api.nvim_set_hl(0, "CopilotInfo", { fg = "#61AfEF" })
                 vim.api.nvim_set_hl(0, "AttachedLSPInfo", { fg = "#d3869b", italic = true })
