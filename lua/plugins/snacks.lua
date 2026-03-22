@@ -22,7 +22,7 @@ require("snacks").setup({
     words = { enabled = true },
     explorer = { enabled = true },
     bigfile = { enabled = true },
-    -- terminal = { enabled = true },
+    terminal = { enabled = false },
     dashboard = {
         enabled = true,
         width = 60,
@@ -112,7 +112,7 @@ Not a bug, but a feature!
     },
     image = {
         enabled = true,
-        doc = { enabled = true, inline = false, float = false, max_width = 80, max_height = 20 },
+        doc = { enabled = true, inline = true, float = false, max_width = 80, max_height = 20 },
     },
     indent = {
         enabled = true,
