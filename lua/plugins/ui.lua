@@ -3,10 +3,10 @@ vim.pack.add({
     { src = "https://github.com/olimorris/onedarkpro.nvim" },
     { src = "https://github.com/craftzdog/solarized-osaka.nvim" },
     { src = "https://github.com/ellisonleao/gruvbox.nvim" },
-    { src = "https://github.com/nvim-mini/mini.files" },      -- 文件浏览器
-    { src = "https://github.com/nvim-mini/mini.statusline" }, -- 状态栏
+    { src = "https://github.com/nvim-mini/mini.files" }, -- 文件浏览器
     { src = "https://github.com/nvim-mini/mini.icons" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
+    { src = "https://github.com/MunifTanjim/nui.nvim" },
     { src = "https://github.com/folke/noice.nvim" },
     -- { src = 'https://github.com/akinsho/git-conflict.nvim',     tag = "*" },
 })
@@ -89,8 +89,8 @@ local function noice_setup()
         views = {
             cmdline_popup = {
                 backend = "popup",
-                relative = "editor",
-                zindex = 200,
+                -- relative = "editor",
+                -- zindex = 200,
                 position = {
                     row = "45%", -- 40% from top of the screen. This will position it almost at the center.
                     col = "50%",
@@ -103,94 +103,8 @@ local function noice_setup()
         },
         cmdline = {
             view = "cmdline_popup", -- cmdline_popup, cmdline
+            -- view = "cmdline", -- cmdline_popup, cmdline
         },
-    })
-end
-
-local function statusline_setup()
-    local attached_lsp = {}
-    local copilot = nil
-    local compute_attached_lsp = function(buf_id)
-        local names = {}
-        for _, server in pairs(vim.lsp.get_clients({ bufnr = buf_id })) do
-            if server.name == "copilot" then
-                copilot = ""
-            else
-                table.insert(names, server.name)
-            end
-        end
-
-        local lsps = table.concat(names, ", ")
-        -- vim.notify("lsps:" .. buf_id .. ":" .. lsps)
-        return lsps
-    end
-    vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
-        pattern = "*",
-        callback = function(arg)
-            local fn = vim.schedule_wrap(function(data)
-                attached_lsp[data.buf] = vim.api.nvim_buf_is_valid(data.buf) and compute_attached_lsp(data.buf) or nil
-                vim.cmd("redrawstatus")
-            end)
-            fn(arg)
-            local buf = vim.api.nvim_get_current_buf()
-            -- vim.notify("fnlsp:" .. buf .. ":" .. (attached_lsp[vim.api.nvim_get_current_buf()] or ""))
-        end,
-    })
-
-    local sl = require("mini.statusline")
-    sl.setup({
-        content = {
-            -- Content for active window
-            active = function()
-                local mode, mode_hl = sl.section_mode({ trunc_width = 120 })
-                local git = sl.section_git({ trunc_width = 40 })
-                local diff = sl.section_diff({ trunc_width = 75 })
-                local diagnostics = sl.section_diagnostics({ trunc_width = 75 })
-                -- local lsp = sl.section_lsp({ trunc_width = 75 })
-                local filename = sl.section_filename({ trunc_width = 140 })
-                local fileinfo = sl.section_fileinfo({ trunc_width = 120 })
-                local location = sl.section_location({ trunc_width = 75 })
-                local search = sl.section_searchcount({ trunc_width = 75 })
-
-                local section_lsp = function(args)
-                    if sl.is_truncated(args.trunc_width) then
-                        return ""
-                    end
-
-                    local attached = attached_lsp[vim.api.nvim_get_current_buf()] or ""
-
-                    if attached == "" then
-                        return ""
-                    end
-
-                    return " " .. attached
-                end
-
-                local lsp = section_lsp({ trunc_width = 75 })
-                vim.api.nvim_set_hl(0, "CopilotInfo", { fg = "#61AfEF" })
-                vim.api.nvim_set_hl(0, "AttachedLSPInfo", { fg = "#d3869b", italic = true })
-
-                -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
-                -- correct padding with spaces between groups (accounts for 'missing'
-                -- sections, etc.)
-                return sl.combine_groups({
-                    { hl = mode_hl,                 strings = { mode } },
-                    { hl = "MiniStatuslineDevinfo", strings = { git, diff, diagnostics } },
-                    { hl = "CopilotInfo",           strings = { copilot or "" } },
-                    "%<", -- Mark general truncate point
-                    { hl = "MiniStatuslineFilename", strings = { filename } },
-                    "%=", -- End left alignment
-                    { hl = "AttachedLSPInfo",        strings = { lsp } },
-                    { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
-                    { hl = mode_hl,                  strings = { search, location } },
-                })
-            end,
-            -- Content for inactive window(s)
-            inactive = nil,
-        },
-
-        -- Whether to use icons by default
-        use_icons = true,
     })
 end
 
@@ -213,8 +127,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
             minifiles.open(vim.api.nvim_buf_get_name(0), false)
             minifiles.reveal_cwd()
         end, { desc = "Toggle into currently opened file" })
-        -- require("mini.statusline").setup({})
-        statusline_setup()
         noice_setup()
     end,
 })

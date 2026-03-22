@@ -5,21 +5,21 @@ vim.pack.add({
     { src = "https://github.com/Bekaboo/dropbar.nvim" },
 })
 
-vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
     -- vim.api.nvim_create_autocmd({ 'VimEnter' }, {
     group = vim.api.nvim_create_augroup("SetupTreesitter", { clear = true }),
     once = true,
     callback = function()
         ---@diagnostic disable-next-line: missing-fields
-        require('nvim-treesitter.configs').setup {
+        require("nvim-treesitter.configs").setup({
             ensure_installed = {
-                'diff',
-                'snakemake',
-                'yaml',
+                "diff",
+                "snakemake",
+                "yaml",
             },
             ignore_install = {
-                'latex',
-                'xml',
+                "latex",
+                "xml",
             },
             auto_install = true,
             highlight = {
@@ -37,17 +37,17 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
                 --     return lang == 'yaml' and vim.api.nvim_buf_line_count(bufnr) > 5000
                 -- end,
                 --
-                additional_vim_regex_highlighting = { 'ruby' },
+                additional_vim_regex_highlighting = { "ruby" },
             },
-            indent = { enable = true, disable = { 'ruby' } },
-        }
+            indent = { enable = true, disable = { "ruby" } },
+        })
         require("treesitter-context").setup({
             separator = nil,
             max_lines = 3,
             multiwindow = true,
             min_window_height = 15,
         })
-        vim.api.nvim_set_hl(0, "TreesitterContext", { link = "CursorLine" })       -- remove existing link
+        vim.api.nvim_set_hl(0, "TreesitterContext", { link = "CursorLine" }) -- remove existing link
         vim.api.nvim_set_hl(0, "TreesitterContextBottom", { link = "CursorLine" }) -- remove existing link
         vim.keymap.set("n", "[c", function()
             require("treesitter-context").go_to_context(vim.v.count1)
@@ -58,7 +58,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
         vim.api.nvim_exec_autocmds("User", { pattern = "TsLoaded" })
 
         -- configuration of textobjects
-        require("nvim-treesitter-textobjects").setup {
+        require("nvim-treesitter-textobjects").setup({
             select = {
                 -- Automatically jump forward to textobj, similar to targets.vim
                 lookahead = true,
@@ -70,8 +70,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
                 -- and should return the mode ('v', 'V', or '<c-v>') or a table
                 -- mapping query_strings to modes.
                 selection_modes = {
-                    ['@parameter.outer'] = 'v', -- charwise
-                    ['@function.outer'] = 'V',  -- linewise
+                    ["@parameter.outer"] = "v", -- charwise
+                    ["@function.outer"] = "V", -- linewise
                     -- ['@class.outer'] = '<c-v>', -- blockwise
                 },
                 -- If you set this to `true` (default is `false`) then any textobject is
@@ -85,25 +85,25 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
                 -- and should return true of false
                 include_surrounding_whitespace = false,
             },
-        }
+        })
 
         -- keymaps
         -- You can use the capture groups defined in `textobjects.scm`
         vim.keymap.set({ "x", "o" }, "am", function()
-            require "nvim-treesitter-textobjects.select".select_textobject("@function.outer", "textobjects")
+            require("nvim-treesitter-textobjects.select").select_textobject("@function.outer", "textobjects")
         end, { desc = "around method block" })
         vim.keymap.set({ "x", "o" }, "im", function()
-            require "nvim-treesitter-textobjects.select".select_textobject("@function.inner", "textobjects")
+            require("nvim-treesitter-textobjects.select").select_textobject("@function.inner", "textobjects")
         end, { desc = "inner method block" })
         vim.keymap.set({ "x", "o" }, "ac", function()
-            require "nvim-treesitter-textobjects.select".select_textobject("@class.outer", "textobjects")
+            require("nvim-treesitter-textobjects.select").select_textobject("@class.outer", "textobjects")
         end, { desc = "around class block" })
         vim.keymap.set({ "x", "o" }, "ic", function()
-            require "nvim-treesitter-textobjects.select".select_textobject("@class.inner", "textobjects")
+            require("nvim-treesitter-textobjects.select").select_textobject("@class.inner", "textobjects")
         end, { desc = "inner class block" })
         -- You can also use captures from other query groups like `locals.scm`
         vim.keymap.set({ "x", "o" }, "as", function()
-            require "nvim-treesitter-textobjects.select".select_textobject("@local.scope", "locals")
+            require("nvim-treesitter-textobjects.select").select_textobject("@local.scope", "locals")
         end, { desc = "around local scope block" })
 
         vim.keymap.set({ "n", "x", "o" }, "]a", function()
@@ -132,33 +132,37 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
         vim.keymap.set({ "n", "x", "o" }, "[F", function()
             require("nvim-treesitter-textobjects.move").goto_previous_end("@function.outer", "textobjects")
         end, { desc = "previous function(end)" })
-    end -- configuration
+    end, -- configuration
 })
 
-vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'c', 'cpp', 'python', 'make' },
-    callback = function() vim.treesitter.start() end,
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "c", "cpp", "python", "make" },
+    callback = function()
+        vim.treesitter.start()
+    end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "*",
     once = true,
     callback = function()
-        require('dropbar').setup({
-            icons = {
-                enable = true,
-                kinds = {
-                    dir_icon = function(_)
-                        return "󰝰 ", 'DropBarIconKindFolder'
-                    end,
-                }
-            }
-        })
-        local dropbar_api = require("dropbar.api")
-        vim.keymap.set('n', '<Leader>;', dropbar_api.pick, { desc = 'Pick symbols in winbar' })
-        vim.keymap.set('n', '[;', dropbar_api.goto_context_start, { desc = 'Go to start of current context' })
-        vim.keymap.set('n', '];', dropbar_api.select_next_context, { desc = 'Select next context' })
+        vim.defer_fn(function()
+            require("dropbar").setup({
+                icons = {
+                    enable = true,
+                    kinds = {
+                        dir_icon = function(_)
+                            return "󰝰 ", "DropBarIconKindFolder"
+                        end,
+                    },
+                },
+            })
+            local dropbar_api = require("dropbar.api")
+            vim.keymap.set("n", "<Leader>;", dropbar_api.pick, { desc = "Pick symbols in winbar" })
+            vim.keymap.set("n", "[;", dropbar_api.goto_context_start, { desc = "Go to start of current context" })
+            vim.keymap.set("n", "];", dropbar_api.select_next_context, { desc = "Select next context" })
 
-        vim.ui.select = require('dropbar.utils.menu').select
-    end
+            vim.ui.select = require("dropbar.utils.menu").select
+        end, 50)
+    end,
 })

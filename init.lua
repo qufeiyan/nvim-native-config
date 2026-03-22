@@ -12,6 +12,7 @@ require("config.autocmds")
 require("plugins.snacks")
 require("plugins.treesitter")
 require("plugins.ui")
+require("plugins.statusline")
 require("plugins.blink")
 -- 加载终端管理模块
 -- require("config.terminal").setup()

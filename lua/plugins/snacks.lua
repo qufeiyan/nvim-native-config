@@ -1,7 +1,9 @@
+---@diagnostic disable: undefined-doc-param
 vim.pack.add({
     { src = "https://github.com/folke/snacks.nvim" },
 })
 -- Picker
+---@param opts snacks.Config?
 require("snacks").setup({
     notifier = { enabled = true, timeout = 3000 },
     picker = {
@@ -163,22 +165,22 @@ Not a bug, but a feature!
         },
     },
 })
-local map = function(key, func, desc)
-    vim.keymap.set({ "n", "v" }, key, func, { desc = desc })
+local map = function(key, func, opts)
+    vim.keymap.set({ "n", "v" }, key, func, opts)
 end
 
-map("<leader><space>", Snacks.picker.smart, "Smart find file")
+map("<leader><space>", Snacks.picker.smart, { desc = "Smart find file" })
 map("<leader>ff", function()
     Snacks.picker.files()
-end, "Find nvim config file")
+end, { desc = "Find nvim config file" })
 
-map("<leader>fo", Snacks.picker.recent, "Find recent file")
+map("<leader>fo", Snacks.picker.recent, { desc = "Find recent file" })
 map("<leader>fg", function()
     Snacks.picker.grep({
         prompt = "Grep> ",
         -- filter = { cwd = true },
     })
-end, "Snacks live grep")
+end, { desc = "Snacks live grep" })
 vim.keymap.set({ "n", "v", "x" }, "<leader>fw", function()
     Snacks.picker.grep_word({
         prompt = "| Grep word> ",
@@ -189,22 +191,39 @@ vim.keymap.set({ "n", "v", "x" }, "<leader>fw", function()
 end, { desc = "Find word under cursor" })
 map("<leader>fh", function()
     Snacks.picker.help({ layout = "dropdown" })
-end, "Find in help")
-map("<leader>fl", Snacks.picker.picker_layouts, "Find picker layout")
+end, { desc = "Find in help" })
+map("<leader>fl", Snacks.picker.picker_layouts, { desc = "Find picker layout" })
 map("<leader>fk", function()
     Snacks.picker.keymaps({ layout = "dropdown" })
-end, "Find keymap")
+end, { desc = "Find keymap" })
 map("<leader>fb", function()
     Snacks.picker.buffers({ sort_lastused = true })
-end, "Find buffers")
-map("<leader>fm", Snacks.picker.marks, "Find mark")
+end, { desc = "Find buffers" })
+map("<leader>fm", Snacks.picker.marks, { desc = "Find mark" })
 map("<leader>fn", function()
     Snacks.picker.notifications({ layout = "dropdown" })
-end, "Find notification")
-map("grr", Snacks.picker.lsp_references, "Find lsp references")
-map("gai", Snacks.picker.lsp_incoming_calls, "C[a]lls Incoming")
-map("gao", Snacks.picker.lsp_outgoing_calls, "C[a]lls Outgoing")
-map("<leader>fS", Snacks.picker.lsp_workspace_symbols, "Find workspace symbol")
+end, { desc = "Find notification" })
+-- LSP
+map("gd", function()
+    Snacks.picker.lsp_definitions()
+end, { desc = "Goto Definition" })
+map("gD", function()
+    Snacks.picker.lsp_declarations()
+end, { desc = "Goto Declaration" })
+map("gr", function()
+    Snacks.picker.lsp_references()
+end, { nowait = true, desc = "References" })
+map("gI", function()
+    Snacks.picker.lsp_implementations()
+end, { desc = "Goto Implementation" })
+map("gy", function()
+    Snacks.picker.lsp_type_definitions()
+end, { desc = "Goto T[y]pe Definition" })
+
+map("grr", Snacks.picker.lsp_references, { desc = "Find lsp references" })
+map("gai", Snacks.picker.lsp_incoming_calls, { desc = "C[a]lls Incoming" })
+map("gao", Snacks.picker.lsp_outgoing_calls, { desc = "C[a]lls Outgoing" })
+map("<leader>fS", Snacks.picker.lsp_workspace_symbols, { desc = "Find workspace symbol" })
 map("<leader>fs", function()
     local bufnr = vim.api.nvim_get_current_buf()
     local clients = vim.lsp.get_clients({ bufnr = bufnr })
@@ -229,16 +248,16 @@ map("<leader>fs", function()
     else
         Snacks.picker.treesitter()
     end
-end, "Find symbol in current buffer")
+end, { desc = "Find symbol in current buffer" })
 -- need network?
-map("<leader>fi", Snacks.picker.icons, "Find icon")
-map("<leader>fd", Snacks.picker.diagnostics_buffer, "Find diagnostic in current buffer")
-map("<leader>fH", Snacks.picker.highlights, "Find highlight")
+map("<leader>fi", Snacks.picker.icons, { desc = "Find icon" })
+map("<leader>fd", Snacks.picker.diagnostics_buffer, { desc = "Find diagnostic in current buffer" })
+map("<leader>fH", Snacks.picker.highlights, { desc = "Find highlight" })
 map("<leader>fc", function()
     Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
-end, "Find nvim config file")
-map("<leader>f/", Snacks.picker.search_history, "Find search history")
-map("<leader>fj", Snacks.picker.jumps, "Find jump")
+end, { desc = "Find nvim config file" })
+map("<leader>f/", Snacks.picker.search_history, { desc = "Find search history" })
+map("<leader>fj", Snacks.picker.jumps, { desc = "Find jump" })
 map("<leader>ft", function()
     if vim.bo.filetype == "markdown" then
         Snacks.picker.grep_buffers({
@@ -257,54 +276,56 @@ map("<leader>ft", function()
             layout = "ivy",
         })
     else
-        Snacks.picker.todo_comments({ keywords = { "NOTE", "TODO", "FIX", "FIXME", "HACK" }, layout = "select" })
+        Snacks.picker.todo_comments({
+            keywords = { "NOTE", { desc = "TODO", "FIX", "FIXME", "HACK" }, layout = "select" },
+        })
     end
-end, "Find todo")
+end, { desc = "Find todo" })
 
 map("<leader>fF", function()
     Snacks.picker.lines({ search = "FCN=" })
-end, "Find line in current buffer")
+end, { desc = "Find line in current buffer" })
 
 -- other snacks features
-map("<leader>bc", Snacks.bufdelete.delete, "Delete buffers")
-map("<leader>bC", Snacks.bufdelete.other, "Delete other buffers")
+map("<leader>bc", Snacks.bufdelete.delete, { desc = "Delete buffers" })
+map("<leader>bC", Snacks.bufdelete.other, { desc = "Delete other buffers" })
 -- map("<leader>gg", function()
 -- Snacks.lazygit({ cwd = Snacks.git.get_root() })
--- end, "Open lazygit")
-map("<leader>n", Snacks.notifier.show_history, "Notification history")
-map("<leader>N", Snacks.notifier.hide, "Notification history")
-map("<leader>gb", Snacks.git.blame_line, "Git blame line")
+-- end, { desc = "Open lazygit" })
+map("<leader>n", Snacks.notifier.show_history, { desc = "Notification history" })
+map("<leader>N", Snacks.notifier.hide, { desc = "Notification history" })
+map("<leader>gb", Snacks.git.blame_line, { desc = "Git blame line" })
 
-map("<leader>K", Snacks.image.hover, "Display image in hover")
+map("<leader>K", Snacks.image.hover, { desc = "Display image in hover" })
 
 map("<leader>z", function()
     Snacks.zen()
-end, "Toggle Zen Mode")
+end, { desc = "Toggle Zen Mode" })
 
 map("<leader>Z", function()
     Snacks.zen.zoom()
-end, "Toggle Zoom")
+end, { desc = "Toggle Zoom" })
 
 map("<leader>e", function()
     Snacks.explorer()
-end, "File Explorer")
+end, { desc = "File Explorer" })
 map("<leader>:", function()
     Snacks.picker.command_history()
-end, "Command History")
+end, { desc = "Command History" })
 map("<leader>/", function()
     Snacks.picker.commands()
-end, "Commands")
-map("<leader>`", ":lua Snacks.terminal()<CR>", "Toggle Terminal")
+end, { desc = "Commands" })
+map("<leader>`", ":lua Snacks.terminal()<CR>", { desc = "Toggle Terminal" })
 
 map("<leader>fC", function()
     Snacks.picker.colorschemes()
-end, "Find colorschemes")
+end, { desc = "Find colorschemes" })
 map("<leader>fu", function()
     Snacks.picker.undo()
-end, "Find undo history")
+end, { desc = "Find undo history" })
 map("<leader>fq", function()
     Snacks.picker.qflist()
-end, "Quickfix List")
+end, { desc = "Quickfix List" })
 
 vim.keymap.set("n", "<leader>gg", "<cmd>lua Snacks.lazygit()<CR>", { desc = "Open lazygit" })
 
@@ -327,4 +348,4 @@ vim.keymap.set("t", "<C-t><C-t>", "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>"
 
 -- align to vscode
 -- map('<C-S-;>', Snacks.picker.lsp_workspace_symbols, 'Find workspace symbols')
-map("<C-S-o>", Snacks.picker.lsp_symbols, "Find workspace symbols")
+-- map("<C-S-o>", Snacks.picker.lsp_symbols, { desc = "Find workspace symbols" })
