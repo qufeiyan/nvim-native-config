@@ -32,7 +32,7 @@ require("gruvbox").setup({
     invert_signs = false,
     invert_tabline = false,
     inverse = true, -- invert background for search, diffs, statuslines and errors
-    contrast = "",  -- can be "hard", "soft" or empty string
+    contrast = "", -- can be "hard", "soft" or empty string
     palette_overrides = {},
     overrides = {
         Pmenu = { link = "Normal" },
@@ -76,11 +76,11 @@ local function noice_setup()
         },
         -- you can enable a preset for easier configuration
         presets = {
-            bottom_search = true,         -- use a classic bottom cmdline for search
-            command_palette = true,       -- position the cmdline and popupmenu together
+            bottom_search = true, -- use a classic bottom cmdline for search
+            command_palette = true, -- position the cmdline and popupmenu together
             long_message_to_split = true, -- long messages will be sent to a split
-            inc_rename = false,           -- enables an input dialog for inc-rename.nvim
-            lsp_doc_border = true,        -- add a border to hover docs and signature help
+            inc_rename = false, -- enables an input dialog for inc-rename.nvim
+            lsp_doc_border = true, -- add a border to hover docs and signature help
         },
         -- Position the command popup at the center of the screen
         -- See https://github.com/folke/noice.nvim/blob/0cbe3f88d038320bdbda3c4c5c95f43a13c3aa12/lua/noice/types/nui.lua#L6
@@ -223,7 +223,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     once = true,
     callback = function()
         vim.opt.foldcolumn = "1" -- '0' is not bad
-        vim.opt.foldlevel = 99   -- Using ufo provider need a large value, feel free to decrease the value
+        vim.opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
         vim.opt.foldlevelstart = 99
         vim.opt.foldenable = true
 
@@ -322,45 +322,45 @@ vim.api.nvim_create_autocmd("BufFilePost", {
     once = true,
     callback = function()
         require("colorizer").setup({
-            filetypes = { "*" },          -- Filetype options.  Accepts table like `user_default_options`
-            buftypes = {},                -- Buftype options.  Accepts table like `user_default_options`
+            filetypes = { "*" }, -- Filetype options.  Accepts table like `user_default_options`
+            buftypes = {}, -- Buftype options.  Accepts table like `user_default_options`
             -- Boolean | List of usercommands to enable.  See User commands section.
-            user_commands = true,         -- Enable all or some usercommands
-            lazy_load = false,            -- Lazily schedule buffer highlighting setup function
+            user_commands = true, -- Enable all or some usercommands
+            lazy_load = false, -- Lazily schedule buffer highlighting setup function
             user_default_options = {
-                names = true,             -- "Name" codes like Blue or red.  Added from `vim.api.nvim_get_color_map()`
-                names_opts = {            -- options for mutating/filtering names.
-                    lowercase = true,     -- name:lower(), highlight `blue` and `red`
-                    camelcase = true,     -- name, highlight `Blue` and `Red`
-                    uppercase = false,    -- name:upper(), highlight `BLUE` and `RED`
+                names = true, -- "Name" codes like Blue or red.  Added from `vim.api.nvim_get_color_map()`
+                names_opts = { -- options for mutating/filtering names.
+                    lowercase = true, -- name:lower(), highlight `blue` and `red`
+                    camelcase = true, -- name, highlight `Blue` and `Red`
+                    uppercase = false, -- name:upper(), highlight `BLUE` and `RED`
                     strip_digits = false, -- ignore names with digits,
                     -- highlight `blue` and `red`, but not `blue3` and `red4`
                 },
                 -- Expects a table of color name to #RRGGBB value pairs.  # is optional
                 -- Example: { cool = "#107dac", ["notcool"] = "ee9240" }
                 -- Set to false to disable, for example when setting filetype options
-                names_custom = false,     -- Custom names to be highlighted: table|function|false
-                RGB = true,               -- #RGB hex codes
-                RGBA = true,              -- #RGBA hex codes
-                RRGGBB = true,            -- #RRGGBB hex codes
-                RRGGBBAA = false,         -- #RRGGBBAA hex codes
-                AARRGGBB = true,          -- 0xAARRGGBB hex codes 0xffff0000
-                rgb_fn = false,           -- CSS rgb() and rgba() functions
-                hsl_fn = false,           -- CSS hsl() and hsla() functions
-                oklch_fn = false,         -- CSS oklch() function
-                css = false,              -- Enable all CSS *features*:
+                names_custom = false, -- Custom names to be highlighted: table|function|false
+                RGB = true, -- #RGB hex codes
+                RGBA = true, -- #RGBA hex codes
+                RRGGBB = true, -- #RRGGBB hex codes
+                RRGGBBAA = false, -- #RRGGBBAA hex codes
+                AARRGGBB = true, -- 0xAARRGGBB hex codes 0xffff0000
+                rgb_fn = false, -- CSS rgb() and rgba() functions
+                hsl_fn = false, -- CSS hsl() and hsla() functions
+                oklch_fn = false, -- CSS oklch() function
+                css = false, -- Enable all CSS *features*:
                 -- names, RGB, RGBA, RRGGBB, RRGGBBAA, AARRGGBB, rgb_fn, hsl_fn, oklch_fn
-                css_fn = false,           -- Enable all CSS *functions*: rgb_fn, hsl_fn, oklch_fn
+                css_fn = false, -- Enable all CSS *functions*: rgb_fn, hsl_fn, oklch_fn
                 -- Tailwind colors.  boolean|'normal'|'lsp'|'both'.  True sets to 'normal'
-                tailwind = false,         -- Enable tailwind colors
-                tailwind_opts = {         -- Options for highlighting tailwind names
+                tailwind = false, -- Enable tailwind colors
+                tailwind_opts = { -- Options for highlighting tailwind names
                     update_names = false, -- When using tailwind = 'both', update tailwind names from LSP results.  See tailwind section
                 },
                 -- parsers can contain values used in `user_default_options`
                 sass = { enable = false, parsers = { "css" } }, -- Enable sass colors
-                xterm = false,                                  -- Enable xterm 256-color codes (#xNN, \e[38;5;NNNm)
+                xterm = false, -- Enable xterm 256-color codes (#xNN, \e[38;5;NNNm)
                 -- Highlighting mode.  'background'|'foreground'|'virtualtext'
-                mode = "background",                            -- Set the display mode
+                mode = "background", -- Set the display mode
                 -- Virtualtext character to use
                 virtualtext = "■",
                 -- Display virtualtext inline with color.  boolean|'before'|'after'.  True sets to 'after'

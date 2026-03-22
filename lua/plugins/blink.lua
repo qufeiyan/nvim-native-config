@@ -9,16 +9,16 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
     group = vim.api.nvim_create_augroup("SetupCompletion", { clear = true }),
     once = true,
     callback = function()
-        require('lspkind').init({
+        require("lspkind").init({
             -- defines how annotations are shown
             -- default: symbol
             -- options: 'text', 'text_symbol', 'symbol_text', 'symbol'
-            mode = 'symbol_text',
+            mode = "symbol_text",
             -- default symbol map
             -- can be either 'default' (requires nerd-fonts font) or
             -- 'codicons' for codicon preset (requires vscode-codicons font)
             -- default: 'default'
-            preset = 'codicons',
+            preset = "codicons",
         })
         require("blink.cmp").setup({
             fuzzy = {
@@ -74,16 +74,16 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                                     end
                                     return hl
                                 end,
-                            }
+                            },
                         },
                         columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
-                        treesitter = { 'lsp' },
+                        treesitter = { "lsp" },
                     },
                 },
                 ghost_text = {
-                    enabled = true,
+                    enabled = false,
                     show_with_menu = true,
-                }
+                },
             },
             keymap = {
                 preset = "super-tab",
@@ -124,13 +124,13 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                 -- Add 'avante' to the list
                 default = {
                     -- 'avante',
-                    'lsp',
-                    'copilot',
+                    "lsp",
+                    "copilot",
                     -- 'codecompanion',
-                    'snippets',
-                    'path',
-                    'buffer',
-                    'dictionary',
+                    "snippets",
+                    "path",
+                    "buffer",
+                    "dictionary",
                 },
 
                 providers = {
@@ -156,7 +156,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                                 backward = true,
                                 forward = true,
                             },
-                        }
+                        },
                     },
                     snippets = {
                         score_offset = 1000,
@@ -194,14 +194,14 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                     buffer = {
                         opts = {
                             -- get all buffers, even ones like neo-tree
-                            get_bufnrs = vim.api.nvim_list_bufs
+                            get_bufnrs = vim.api.nvim_list_bufs,
                             -- -- or (recommended) filter to only "normal" buffers
                             -- get_bufnrs = function()
                             --     return vim.tbl_filter(function(bufnr)
                             --         return vim.bo[bufnr].buftype == ''
                             --     end, vim.api.nvim_list_bufs())
                             -- end
-                        }
+                        },
                     },
 
                     -- Use the dictionary source
@@ -233,4 +233,3 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
         })
     end,
 })
-

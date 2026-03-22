@@ -25,3 +25,4 @@ build/
 *.un~
 *.viminfo
 *.back
+*.envrc
