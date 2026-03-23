@@ -137,7 +137,7 @@ vim.pack.add({
     { src = "https://github.com/lukas-reineke/indent-blankline.nvim" },
 })
 
-vim.api.nvim_create_autocmd({ "BufReadPost", "BUfNewFile" }, {
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     once = true,
     callback = function()
         local highlight = {
@@ -321,63 +321,65 @@ vim.pack.add({
 vim.api.nvim_create_autocmd("BufFilePost", {
     once = true,
     callback = function()
-        require("colorizer").setup({
-            filetypes = { "*" }, -- Filetype options.  Accepts table like `user_default_options`
-            buftypes = {}, -- Buftype options.  Accepts table like `user_default_options`
-            -- Boolean | List of usercommands to enable.  See User commands section.
-            user_commands = true, -- Enable all or some usercommands
-            lazy_load = false, -- Lazily schedule buffer highlighting setup function
-            user_default_options = {
-                names = true, -- "Name" codes like Blue or red.  Added from `vim.api.nvim_get_color_map()`
-                names_opts = { -- options for mutating/filtering names.
-                    lowercase = true, -- name:lower(), highlight `blue` and `red`
-                    camelcase = true, -- name, highlight `Blue` and `Red`
-                    uppercase = false, -- name:upper(), highlight `BLUE` and `RED`
-                    strip_digits = false, -- ignore names with digits,
-                    -- highlight `blue` and `red`, but not `blue3` and `red4`
+        vim.defer_fn(function()
+            require("colorizer").setup({
+                filetypes = { "*" }, -- Filetype options.  Accepts table like `user_default_options`
+                buftypes = {}, -- Buftype options.  Accepts table like `user_default_options`
+                -- Boolean | List of usercommands to enable.  See User commands section.
+                user_commands = true, -- Enable all or some usercommands
+                lazy_load = false, -- Lazily schedule buffer highlighting setup function
+                user_default_options = {
+                    names = true, -- "Name" codes like Blue or red.  Added from `vim.api.nvim_get_color_map()`
+                    names_opts = { -- options for mutating/filtering names.
+                        lowercase = true, -- name:lower(), highlight `blue` and `red`
+                        camelcase = true, -- name, highlight `Blue` and `Red`
+                        uppercase = false, -- name:upper(), highlight `BLUE` and `RED`
+                        strip_digits = false, -- ignore names with digits,
+                        -- highlight `blue` and `red`, but not `blue3` and `red4`
+                    },
+                    -- Expects a table of color name to #RRGGBB value pairs.  # is optional
+                    -- Example: { cool = "#107dac", ["notcool"] = "ee9240" }
+                    -- Set to false to disable, for example when setting filetype options
+                    names_custom = false, -- Custom names to be highlighted: table|function|false
+                    RGB = true, -- #RGB hex codes
+                    RGBA = true, -- #RGBA hex codes
+                    RRGGBB = true, -- #RRGGBB hex codes
+                    RRGGBBAA = false, -- #RRGGBBAA hex codes
+                    AARRGGBB = true, -- 0xAARRGGBB hex codes 0xffff0000
+                    rgb_fn = false, -- CSS rgb() and rgba() functions
+                    hsl_fn = false, -- CSS hsl() and hsla() functions
+                    oklch_fn = false, -- CSS oklch() function
+                    css = false, -- Enable all CSS *features*:
+                    -- names, RGB, RGBA, RRGGBB, RRGGBBAA, AARRGGBB, rgb_fn, hsl_fn, oklch_fn
+                    css_fn = false, -- Enable all CSS *functions*: rgb_fn, hsl_fn, oklch_fn
+                    -- Tailwind colors.  boolean|'normal'|'lsp'|'both'.  True sets to 'normal'
+                    tailwind = false, -- Enable tailwind colors
+                    tailwind_opts = { -- Options for highlighting tailwind names
+                        update_names = false, -- When using tailwind = 'both', update tailwind names from LSP results.  See tailwind section
+                    },
+                    -- parsers can contain values used in `user_default_options`
+                    sass = { enable = false, parsers = { "css" } }, -- Enable sass colors
+                    xterm = false, -- Enable xterm 256-color codes (#xNN, \e[38;5;NNNm)
+                    -- Highlighting mode.  'background'|'foreground'|'virtualtext'
+                    mode = "background", -- Set the display mode
+                    -- Virtualtext character to use
+                    virtualtext = "■",
+                    -- Display virtualtext inline with color.  boolean|'before'|'after'.  True sets to 'after'
+                    virtualtext_inline = false,
+                    -- Virtualtext highlight mode: 'background'|'foreground'
+                    virtualtext_mode = "foreground",
+                    -- update color values even if buffer is not focused
+                    -- example use: cmp_menu, cmp_docs
+                    always_update = false,
+                    -- hooks to invert control of colorizer
+                    hooks = {
+                        -- called before line parsing.  Accepts boolean or function that returns boolean
+                        -- see hooks section below
+                        disable_line_highlight = false,
+                    },
                 },
-                -- Expects a table of color name to #RRGGBB value pairs.  # is optional
-                -- Example: { cool = "#107dac", ["notcool"] = "ee9240" }
-                -- Set to false to disable, for example when setting filetype options
-                names_custom = false, -- Custom names to be highlighted: table|function|false
-                RGB = true, -- #RGB hex codes
-                RGBA = true, -- #RGBA hex codes
-                RRGGBB = true, -- #RRGGBB hex codes
-                RRGGBBAA = false, -- #RRGGBBAA hex codes
-                AARRGGBB = true, -- 0xAARRGGBB hex codes 0xffff0000
-                rgb_fn = false, -- CSS rgb() and rgba() functions
-                hsl_fn = false, -- CSS hsl() and hsla() functions
-                oklch_fn = false, -- CSS oklch() function
-                css = false, -- Enable all CSS *features*:
-                -- names, RGB, RGBA, RRGGBB, RRGGBBAA, AARRGGBB, rgb_fn, hsl_fn, oklch_fn
-                css_fn = false, -- Enable all CSS *functions*: rgb_fn, hsl_fn, oklch_fn
-                -- Tailwind colors.  boolean|'normal'|'lsp'|'both'.  True sets to 'normal'
-                tailwind = false, -- Enable tailwind colors
-                tailwind_opts = { -- Options for highlighting tailwind names
-                    update_names = false, -- When using tailwind = 'both', update tailwind names from LSP results.  See tailwind section
-                },
-                -- parsers can contain values used in `user_default_options`
-                sass = { enable = false, parsers = { "css" } }, -- Enable sass colors
-                xterm = false, -- Enable xterm 256-color codes (#xNN, \e[38;5;NNNm)
-                -- Highlighting mode.  'background'|'foreground'|'virtualtext'
-                mode = "background", -- Set the display mode
-                -- Virtualtext character to use
-                virtualtext = "■",
-                -- Display virtualtext inline with color.  boolean|'before'|'after'.  True sets to 'after'
-                virtualtext_inline = false,
-                -- Virtualtext highlight mode: 'background'|'foreground'
-                virtualtext_mode = "foreground",
-                -- update color values even if buffer is not focused
-                -- example use: cmp_menu, cmp_docs
-                always_update = false,
-                -- hooks to invert control of colorizer
-                hooks = {
-                    -- called before line parsing.  Accepts boolean or function that returns boolean
-                    -- see hooks section below
-                    disable_line_highlight = false,
-                },
-            },
-        })
+            })
+        end, 100)
     end,
 })
 
@@ -434,28 +436,30 @@ vim.api.nvim_create_autocmd("User", {
     pattern = "TsLoaded",
     once = true,
     callback = function()
-        require("aerial").setup({
-            -- optionally use on_attach to set keymaps when aerial has attached to a buffer
-            on_attach = function(bufnr)
-                -- Jump forwards/backwards with '{' and '}'
-                vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-                vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
-            end,
-            show_guides = true, -- 👈 启用缩进引导线（分割线）
-            -- Customize the characters used when show_guides = true
-            guides = {
-                -- When the child item has a sibling below it
-                mid_item = "├─",
-                -- When the child item is the last in the list
-                last_item = "└─",
-                -- When there are nested child guides to the right
-                nested_top = "│ ",
-                -- Raw indentation
-                whitespace = "  ",
-            },
-            -- autojump = true,
-        })
-        -- You probably also want to set a keymap to toggle aerial
-        vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle!<CR>")
+        vim.defer_fn(function()
+            require("aerial").setup({
+                -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+                on_attach = function(bufnr)
+                    -- Jump forwards/backwards with '{' and '}'
+                    vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+                    vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+                end,
+                show_guides = true, -- 👈 启用缩进引导线（分割线）
+                -- Customize the characters used when show_guides = true
+                guides = {
+                    -- When the child item has a sibling below it
+                    mid_item = "├─",
+                    -- When the child item is the last in the list
+                    last_item = "└─",
+                    -- When there are nested child guides to the right
+                    nested_top = "│ ",
+                    -- Raw indentation
+                    whitespace = "  ",
+                },
+                -- autojump = true,
+            })
+            -- You probably also want to set a keymap to toggle aerial
+            vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle!<CR>")
+        end, 1000)
     end,
 })

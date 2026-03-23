@@ -193,6 +193,9 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 vim.api.nvim_create_autocmd("BufReadPost", {
     once = true,
     callback = function()
+        vim.api.nvim_set_hl(0, "FlashBackdrop", {
+            fg = "#928374",
+        })
         require("flash").setup({
             options = {
                 jump = {
@@ -201,6 +204,20 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                 },
                 label = {
                     uppercase = false,
+                },
+                highlight = {
+                    -- show a backdrop with hl FlashBackdrop
+                    backdrop = true,
+                    -- Highlight the search matches
+                    matches = true,
+                    -- extmark priority
+                    priority = 5000,
+                    groups = {
+                        match = "FlashMatch",
+                        current = "FlashCurrent",
+                        backdrop = "FlashBackdrop",
+                        label = "FlashLabel",
+                    },
                 },
             },
         })

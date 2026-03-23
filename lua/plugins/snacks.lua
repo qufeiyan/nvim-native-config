@@ -277,7 +277,8 @@ map("<leader>ft", function()
         })
     else
         Snacks.picker.todo_comments({
-            keywords = { "NOTE", { desc = "TODO", "FIX", "FIXME", "HACK" }, layout = "select" },
+            keywords = { "NOTE", "TODO", "FIX", "FIXME", "HACK" },
+            layout = "select",
         })
     end
 end, { desc = "Find todo" })
