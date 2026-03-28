@@ -330,12 +330,16 @@ end, { desc = "Quickfix List" })
 
 vim.keymap.set("n", "<leader>gg", "<cmd>lua Snacks.lazygit()<CR>", { desc = "Open lazygit" })
 
-vim.keymap.set("n", "<leader>n", "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>", { desc = "打开终端" })
-vim.keymap.set("t", "<C-j>", "<C-\\><C-n>:lua Snacks.terminal.open()<CR>", { desc = "打开新终端" })
+-- vim.keymap.set("t", "<C-j>", "<C-\\><C-n>:lua Snacks.terminal.open()<CR>", { desc = "打开新终端" })
 vim.keymap.set("t", "<C-w>h", "<C-\\><C-n><C-w>h", { desc = "切到前一个终端" })
 vim.keymap.set("t", "<C-w>l", "<C-\\><C-n><C-w>l", { desc = "切到后一个终端" })
 -- 终端模式快捷键（使用 <C-\><C-n> 退出插入模式后执行命令）
-vim.keymap.set("t", "<C-t><C-t>", "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>", { desc = "打开/隐藏终端" })
+vim.keymap.set(
+    { "n", "t" },
+    "<C-t><C-t>",
+    "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>",
+    { desc = "打开/隐藏终端" }
+)
 
 -- vim.keymap.set({ 'n', 't' }, '<C-t>', function()
 --     Snacks.terminal.toggle()
