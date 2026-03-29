@@ -30,7 +30,8 @@ local function copilot_setup()
             debounce = 15,
             trigger_on_accept = true,
             keymap = {
-                accept = "<C-f>",
+                -- accept = "<C-l>",
+                accept = "<Tab>",
                 accept_word = false,
                 accept_line = false,
                 next = "<M-]>",

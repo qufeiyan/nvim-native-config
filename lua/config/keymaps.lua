@@ -47,6 +47,13 @@ keymap.set("v", "<A-k>", "<cmd>m '<-2<CR>gv=gv", { desc = "Move selection up" })
 keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height" })
 keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height" })
 
+-- emacs keymap
+-- 插入, 命令行模式：Emacs 基础移动（保留补全）
+vim.keymap.set({ "c", "i" }, "<C-a>", "<Home>", { noremap = true, silent = true })
+vim.keymap.set({ "c", "i" }, "<C-e>", "<End>", { noremap = true, silent = true })
+vim.keymap.set({ "c", "i" }, "<C-b>", "<Left>", { noremap = true, silent = true })
+vim.keymap.set({ "c", "i" }, "<C-f>", "<Right>", { noremap = true, silent = true })
+
 -- keymap.set('n', '<leader>w', '<cmd>write<CR>', { desc = 'save file' })
 
 -- LSP 快捷键

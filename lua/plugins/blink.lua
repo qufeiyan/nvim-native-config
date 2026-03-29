@@ -2,7 +2,7 @@ vim.pack.add({
     { src = "https://github.com/onsails/lspkind.nvim" },
     { src = "https://github.com/archie-judd/blink-cmp-words" },
     { src = "https://github.com/fang2hou/blink-copilot" },
-    { src = "https://github.com/saghen/blink.cmp",           version = "v1.8.0" },
+    { src = "https://github.com/saghen/blink.cmp", version = "v1.8.0" },
 })
 
 vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
@@ -87,8 +87,8 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
             },
             keymap = {
                 preset = "super-tab",
-                -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-                -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+                ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+                ["<C-d>"] = { "scroll_documentation_down", "fallback" },
                 ["<Tab>"] = {
                     function(cmp)
                         if vim.b[vim.api.nvim_get_current_buf()].nes_state then
