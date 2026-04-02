@@ -162,14 +162,46 @@ local function statusline_setup()
                 vim.api.nvim_set_hl(0, "Scrollbar", { fg = "#fe8019", bg = "none" })
                 vim.api.nvim_set_hl(0, "@ClockInfo", { link = "Scrollbar" })
 
-                local location = section_location({ trunc_width = 45 })
+                local location = section_location({ trunc_width = 75 })
 
-                local function section_time()
+                local function section_time(args)
+                    if sl.is_truncated(args.trunc_width) then
+                        return ""
+                    end
                     local time = os.date("%H:%M") -- show hour and minute in 24 hour format
                     local clock_icon = "󰀡 " -- add icon for clock
                     return clock_icon .. time
                 end
-                local time = section_time()
+                local time = section_time({ trunc_width = 120 })
+
+                -- overseer
+                local function section_overseer(args)
+                    if sl.is_truncated(args.trunc_width) then
+                        return ""
+                    end
+                    local tasks = require("overseer.task_list").list_tasks({ unique = true, include_ephemeral = true })
+                    local tasks_by_status = require("overseer.util").tbl_group_by(tasks, "status")
+
+                    local symbols = {
+                        ["CANCELED"] = " ",
+                        ["FAILURE"] = "󰅚 ",
+                        ["SUCCESS"] = "󰄴 ",
+                        ["RUNNING"] = "󰑮 ",
+                    }
+
+                    local result = {}
+                    for status, icon in pairs(symbols) do
+                        if tasks_by_status[status] and #tasks_by_status[status] > 0 then
+                            local res = string.format("%s%d", icon, #tasks_by_status[status])
+                            table.insert(result, res)
+                        end
+                    end
+
+                    return table.concat(result, " ")
+                end
+
+                local overseer = section_overseer({ trunc_width = 80 })
+                vim.api.nvim_set_hl(0, "@Overseer", { link = "Scrollbar" })
 
                 -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
                 -- correct padding with spaces between groups (accounts for 'missing'
@@ -181,6 +213,7 @@ local function statusline_setup()
                     "%<", -- Mark general truncate point
                     { hl = "MiniStatuslineFilename", strings = { filename } },
                     "%=", -- End left alignment
+                    { hl = "@Overseer", strings = { overseer } },
                     { hl = "AttachedLSPInfo", strings = { lsp } },
                     { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
                     { hl = "Search", strings = { search } },
