@@ -2,7 +2,7 @@ local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
 -- Do things without affecting the registers
-keymap.set("n", "x", '"_x')
+keymap.set("n", "<Leader>x", '"_x')
 keymap.set("n", "<Leader>c", '"_c')
 keymap.set("n", "<Leader>C", '"_C')
 keymap.set("v", "<Leader>c", '"_c')
@@ -26,16 +26,7 @@ keymap.set("n", "<Leader>O", "O<Esc>^Da", opts)
 -- H move to head of line, L move to end of line
 keymap.set("n", "H", "^", opts)
 keymap.set("n", "L", "$", opts)
--- New tab
--- keymap.set("n", "te", ":tabedit")
--- keymap.set("n", "<tab>", ":tabnext<Return>", opts)
--- keymap.set("n", "<s-tab>", ":tabprev<Return>", opts)
---
 
--- 系统剪贴板
-keymap.set({ "n", "v" }, "<leader>c", '"+y', { desc = "copy to system clipboard" })
-keymap.set({ "n", "v" }, "<leader>x", '"+d', { desc = "cut to system clipboard" })
-keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "paste to system clipboard" })
 -- 窗口切换
 keymap.set("n", "<leader>ww", "<C-w>w", { desc = "focus windows" })
 -- 行移动
@@ -53,8 +44,6 @@ vim.keymap.set({ "c", "i" }, "<C-a>", "<Home>", { noremap = true, silent = true 
 vim.keymap.set({ "c", "i" }, "<C-e>", "<End>", { noremap = true, silent = true })
 vim.keymap.set({ "c", "i" }, "<C-b>", "<Left>", { noremap = true, silent = true })
 vim.keymap.set({ "c", "i" }, "<C-f>", "<Right>", { noremap = true, silent = true })
-
--- keymap.set('n', '<leader>w', '<cmd>write<CR>', { desc = 'save file' })
 
 -- LSP 快捷键
 -- keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition' })

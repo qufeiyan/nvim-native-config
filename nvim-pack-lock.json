@@ -70,8 +70,8 @@
       "src": "git@github.com:lewis6991/gitsigns.nvim.git"
     },
     "gruvbox.nvim": {
-      "rev": "561126520034a1dac2f78ab063db025d12555998",
-      "src": "git@github.com:ellisonleao/gruvbox.nvim.git"
+      "rev": "334d5fd49fc8033f26408425366c66c6390c57bb",
+      "src": "https://github.com/ellisonleao/gruvbox.nvim"
     },
     "heirline.nvim": {
       "rev": "fae936abb5e0345b85c3a03ecf38525b0828b992",
@@ -85,10 +85,6 @@
       "rev": "005b56001b2cb30bfa61b7986bc50657816ba4ba",
       "src": "https://github.com/lukas-reineke/indent-blankline.nvim"
     },
-    "lazydev.nvim": {
-      "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
-      "src": "git@github.com:folke/lazydev.nvim.git"
-    },
     "lsp-progress.nvim": {
       "rev": "ae52979ad412371ea6dc39ff70c8dfc681fb42b8",
       "src": "https://github.com/linrongbin16/lsp-progress.nvim"
@@ -96,10 +92,6 @@
     "lspkind.nvim": {
       "rev": "c7274c48137396526b59d86232eabcdc7fed8a32",
       "src": "https://github.com/onsails/lspkind.nvim"
-    },
-    "mason.nvim": {
-      "rev": "44d1e90e1f66e077268191e3ee9d2ac97cc18e65",
-      "src": "git@github.com:mason-org/mason.nvim.git"
     },
     "meow.yarn.nvim": {
       "rev": "a7e6770d21a36db90f68d4785ece4d2ade06ccf5",
@@ -127,15 +119,11 @@
     },
     "noice.nvim": {
       "rev": "7bfd942445fb63089b59f97ca487d605e715f155",
-      "src": "git@github.com:folke/noice.nvim.git"
+      "src": "https://github.com/folke/noice.nvim"
     },
     "nui.nvim": {
       "rev": "de740991c12411b663994b2860f1a4fd0937c130",
       "src": "https://github.com/MunifTanjim/nui.nvim"
-    },
-    "nvim": {
-      "rev": "193e123cdbc4dd3e86db883d55349e9587f0ded6",
-      "src": "https://github.com/catppuccin/nvim"
     },
     "nvim-autopairs": {
       "rev": "7a2c97cccd60abc559344042fefb1d5a85b3e33b",
@@ -197,6 +185,10 @@
       "rev": "07d088bf8bdadd159eb807b90eaee86a4778383f",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
+    "smart-splits.nvim": {
+      "rev": "23f1e57d5af462c69e988642c020430449a7b1b0",
+      "src": "git@github.com:mrjones2014/smart-splits.nvim.git"
+    },
     "snacks.nvim": {
       "rev": "fe7cfe9800a182274d0f868a74b7263b8c0c020b",
       "src": "https://github.com/folke/snacks.nvim"
@@ -212,10 +204,6 @@
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "https://github.com/folke/todo-comments.nvim"
-    },
-    "tokyonight.nvim": {
-      "rev": "5da1b76e64daf4c5d410f06bcb6b9cb640da7dfd",
-      "src": "https://github.com/folke/tokyonight.nvim"
     },
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",

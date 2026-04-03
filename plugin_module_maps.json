@@ -5,7 +5,7 @@
     "fidget.nvim":"fidget",
     "flash.nvim":"flash",
     "git-conflict.nvim":"git-conflict",
-    "gruvbox":"gruvbox",
+    "gruvbox.nvim":"gruvbox",
     "nvim":"catppuccin",
     "heirline.nvim":"heirline",
     "indent-blankline.nvim":"ibl",
