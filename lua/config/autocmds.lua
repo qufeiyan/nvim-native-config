@@ -69,6 +69,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
     pattern = { '*' },
     callback = function()
+        if vim.bo.filetype == "snacks_dashboard" then
+            return
+        end
         vim.api.nvim_exec2('silent! normal! g`"zv', { output = false })
     end,
 })
