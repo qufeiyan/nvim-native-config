@@ -10,44 +10,26 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
     group = vim.api.nvim_create_augroup("SetupTreesitter", { clear = true }),
     once = true,
     callback = function()
-        ---@diagnostic disable-next-line: missing-fields
-        require("nvim-treesitter.configs").setup({
-            ensure_installed = {
-                "diff",
-                "snakemake",
-                "yaml",
-            },
-            ignore_install = {
-                "latex",
-                "xml",
-            },
-            auto_install = true,
-            highlight = {
-                enable = true,
-                -- disable = { 'latex' },
-                -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-                disable = function(lang, buf)
-                    local max_filesize = 100 * 1024 -- 100 KB
-                    local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-                    if ok and stats and stats.size > max_filesize then
-                        return true
-                    end
-                end,
-                -- disable = function(lang, bufnr)
-                --     return lang == 'yaml' and vim.api.nvim_buf_line_count(bufnr) > 5000
-                -- end,
-                --
-                additional_vim_regex_highlighting = { "ruby" },
-            },
-            indent = { enable = true, disable = { "ruby" } },
-        })
+        -- require("nvim-treesitter").setup({})
+        local ensureInstalled = {
+            'lua', 'python', 'typescript', 'c', 'cpp', 'rust', 'make', 'snakemake', 'vim', 'vimdoc', 'markdown',
+            'markdown_inline',
+            -- ... your parsers
+        }
+        local alreadyInstalled = require('nvim-treesitter.config').get_installed()
+        local parsersToInstall = vim.iter(ensureInstalled)
+            :filter(function(parser)
+                return not vim.tbl_contains(alreadyInstalled, parser)
+            end)
+            :totable()
+        require('nvim-treesitter').install(parsersToInstall)
         require("treesitter-context").setup({
             separator = nil,
             max_lines = 3,
             multiwindow = true,
             min_window_height = 15,
         })
-        vim.api.nvim_set_hl(0, "TreesitterContext", { link = "CursorLine" }) -- remove existing link
+        vim.api.nvim_set_hl(0, "TreesitterContext", { link = "CursorLine" })       -- remove existing link
         vim.api.nvim_set_hl(0, "TreesitterContextBottom", { link = "CursorLine" }) -- remove existing link
         vim.keymap.set("n", "[c", function()
             require("treesitter-context").go_to_context(vim.v.count1)
@@ -71,7 +53,7 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
                 -- mapping query_strings to modes.
                 selection_modes = {
                     ["@parameter.outer"] = "v", -- charwise
-                    ["@function.outer"] = "V", -- linewise
+                    ["@function.outer"] = "V",  -- linewise
                     -- ['@class.outer'] = '<c-v>', -- blockwise
                 },
                 -- If you set this to `true` (default is `false`) then any textobject is
@@ -136,9 +118,16 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "c", "cpp", "python", "make" },
+    pattern = { "c", "cpp", "python", "make", "rust" },
     callback = function()
-        vim.treesitter.start()
+        -- Enable treesitter highlighting and disable regex syntax
+        pcall(vim.treesitter.start)
+        -- Enable treesitter-based indentation
+        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+
+        -- Enable treesitter-based folding
+        vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+        vim.wo[0][0].foldmethod = 'expr'
     end,
 })
 

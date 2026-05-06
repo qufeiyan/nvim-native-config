@@ -294,7 +294,7 @@ map("<leader>bC", Snacks.bufdelete.other, { desc = "Delete other buffers" })
 -- Snacks.lazygit({ cwd = Snacks.git.get_root() })
 -- end, { desc = "Open lazygit" })
 map("<leader>n", Snacks.notifier.show_history, { desc = "Notification history" })
-map("<leader>N", Snacks.notifier.hide, { desc = "Notification history" })
+map("<leader>N", Snacks.notifier.hide, { desc = "Hide notification history" })
 map("<leader>gb", Snacks.git.blame_line, { desc = "Git blame line" })
 
 map("<leader>K", Snacks.image.hover, { desc = "Display image in hover" })
@@ -340,6 +340,7 @@ vim.keymap.set(
     "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>",
     { desc = "打开/隐藏终端" }
 )
+
 
 -- vim.keymap.set({ 'n', 't' }, '<C-t>', function()
 --     Snacks.terminal.toggle()

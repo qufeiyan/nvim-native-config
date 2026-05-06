@@ -70,7 +70,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                     else
                         gitsigns.nav_hunk("next")
                     end
-                end)
+                end, { desc = "Go to next/prev hunk" })
 
                 map("n", "[c", function()
                     if vim.wo.diff then
@@ -78,7 +78,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                     else
                         gitsigns.nav_hunk("prev")
                     end
-                end)
+                end, { desc = "Go to next/prev hunk" })
 
                 -- Actions
                 map("n", "<leader>gs", gitsigns.stage_hunk, { desc = "Stage Hunk" })
