@@ -22,7 +22,7 @@ require("snacks").setup({
     words = { enabled = true },
     explorer = { enabled = true },
     bigfile = { enabled = true },
-    terminal = { enabled = false },
+    terminal = { enabled = true },
     dashboard = {
         enabled = true,
         width = 60,
@@ -316,7 +316,6 @@ end, { desc = "Command History" })
 map("<leader>/", function()
     Snacks.picker.commands()
 end, { desc = "Commands" })
-map("<leader>`", ":lua Snacks.terminal()<CR>", { desc = "Toggle Terminal" })
 
 map("<leader>fC", function()
     Snacks.picker.colorschemes()
@@ -329,29 +328,3 @@ map("<leader>fq", function()
 end, { desc = "Quickfix List" })
 
 vim.keymap.set("n", "<leader>gg", "<cmd>lua Snacks.lazygit()<CR>", { desc = "Open lazygit" })
-
--- vim.keymap.set("t", "<C-j>", "<C-\\><C-n>:lua Snacks.terminal.open()<CR>", { desc = "打开新终端" })
-vim.keymap.set("t", "<C-w>h", "<C-\\><C-n><C-w>h", { desc = "切到前一个终端" })
-vim.keymap.set("t", "<C-w>l", "<C-\\><C-n><C-w>l", { desc = "切到后一个终端" })
--- 终端模式快捷键（使用 <C-\><C-n> 退出插入模式后执行命令）
-vim.keymap.set(
-    { "n", "t" },
-    "<C-t><C-t>",
-    "<C-\\><C-n>:lua Snacks.terminal.toggle()<CR>",
-    { desc = "打开/隐藏终端" }
-)
-
-
--- vim.keymap.set({ 'n', 't' }, '<C-t>', function()
---     Snacks.terminal.toggle()
--- end, { desc = '打开/隐藏终端' })
-
--- vim.keymap.set('t', '<C-j>', function()
---     Snacks.terminal.open()
---     vim.cmd("startinsert")
---     -- vim.cmd("fish")
--- end, { desc = '打开/隐藏终端' })
-
--- align to vscode
--- map('<C-S-;>', Snacks.picker.lsp_workspace_symbols, 'Find workspace symbols')
--- map("<C-S-o>", Snacks.picker.lsp_symbols, { desc = "Find workspace symbols" })

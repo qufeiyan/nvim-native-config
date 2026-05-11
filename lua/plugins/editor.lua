@@ -188,7 +188,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 -- 加载终端管理模块
--- require("config.terminal").setup()
+require("config.terminal").setup()
 
 vim.api.nvim_create_autocmd("BufReadPost", {
     once = true,
