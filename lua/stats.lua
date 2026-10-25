@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 function M.startup()
     M.startuptime = vim.loop.hrtime()
