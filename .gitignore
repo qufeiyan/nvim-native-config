@@ -12,6 +12,7 @@ Thumbs.db
 *.exe
 
 # Ignore directory and its contents
+docs/
 node_modules/
 dist/
 build/
@@ -26,3 +27,4 @@ build/
 *.viminfo
 *.back
 *.envrc
+CLAUDE.md

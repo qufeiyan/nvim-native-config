@@ -305,10 +305,10 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
                 end,
                 fold_virt_text_handler = handler,
             })
-            vim.keymap.set("n", "zR", ufo.openAllFolds)
-            vim.keymap.set("n", "zM", ufo.closeAllFolds)
-            vim.keymap.set("n", "zr", ufo.openFoldsExceptKinds)
-            vim.keymap.set("n", "zm", ufo.closeFoldsWith) -- closeAllFolds == closeFoldsWith(0)
+            vim.keymap.set("n", "zR", ufo.openAllFolds, { desc = "Open all folds" })
+            vim.keymap.set("n", "zM", ufo.closeAllFolds, { desc = "Close all folds" })
+            vim.keymap.set("n", "zr", ufo.openFoldsExceptKinds, { desc = "Open folds except kinds" })
+            vim.keymap.set("n", "zm", ufo.closeFoldsWith, { desc = "Close folds" })
             vim.keymap.set("n", "zk", function()
                 ufo.peekFoldedLinesUnderCursor()
             end, { desc = "Peek fold" })
@@ -443,8 +443,8 @@ vim.api.nvim_create_autocmd("User", {
                 -- optionally use on_attach to set keymaps when aerial has attached to a buffer
                 on_attach = function(bufnr)
                     -- Jump forwards/backwards with '{' and '}'
-                    vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-                    vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+                    vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Previous symbol" })
+                    vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Next symbol" })
                 end,
                 show_guides = true, -- 👈 启用缩进引导线（分割线）
                 -- Customize the characters used when show_guides = true
@@ -461,7 +461,7 @@ vim.api.nvim_create_autocmd("User", {
                 -- autojump = true,
             })
             -- You probably also want to set a keymap to toggle aerial
-            vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle!<CR>")
+            vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial outline" })
         end, 1000)
     end,
 })

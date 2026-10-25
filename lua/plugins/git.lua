@@ -117,7 +117,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                 map("n", "<leader>gtw", gitsigns.toggle_word_diff, { desc = "Toggle word diff" })
 
                 -- Text object
-                map({ "o", "x" }, "ih", gitsigns.select_hunk)
+                map({ "o", "x" }, "ih", gitsigns.select_hunk, { desc = "Select git hunk" })
             end,
         })
     end,

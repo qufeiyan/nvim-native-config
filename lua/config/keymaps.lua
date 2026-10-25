@@ -2,30 +2,30 @@ local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
 -- Do things without affecting the registers
-keymap.set("n", "<Leader>x", '"_x')
-keymap.set("n", "<Leader>c", '"_c')
-keymap.set("n", "<Leader>C", '"_C')
-keymap.set("v", "<Leader>c", '"_c')
-keymap.set("v", "<Leader>C", '"_C')
-keymap.set("n", "<Leader>d", '"_d')
-keymap.set("n", "<Leader>D", '"_D')
-keymap.set("v", "<Leader>d", '"_d')
-keymap.set("v", "<Leader>D", '"_D')
-
+-- keymap.set("n", "<Leader>x", '"_x', { desc = "Delete char (black-hole)" })
+-- keymap.set("n", "<Leader>c", '"_c', { desc = "Change (black-hole)" })
+-- keymap.set("n", "<Leader>C", '"_C', { desc = "Change to line end (black-hole)" })
+-- keymap.set("v", "<Leader>c", '"_c', { desc = "Change selection (black-hole)" })
+-- keymap.set("v", "<Leader>C", '"_C', { desc = "Change to line end (black-hole)" })
+-- keymap.set("n", "<Leader>d", '"_d', { desc = "Delete (black-hole)" })
+-- keymap.set("n", "<Leader>D", '"_D', { desc = "Delete to line end (black-hole)" })
+-- keymap.set("v", "<Leader>d", '"_d', { desc = "Delete selection (black-hole)" })
+-- keymap.set("v", "<Leader>D", '"_D', { desc = "Delete to line end (black-hole)" })
+--
 -- Increment/decrement
-keymap.set("n", "+", "<C-a>")
-keymap.set("n", "-", "<C-x>")
+keymap.set("n", "+", "<C-a>", { desc = "Increment number" })
+keymap.set("n", "-", "<C-x>", { desc = "Decrement number" })
 
 -- Delete a word backwards
-keymap.set("n", "dw", 'vb"_d')
+keymap.set("n", "dw", 'vb"_d', { desc = "Delete word (black-hole)" })
 
 -- Disable continuations
-keymap.set("n", "<Leader>o", "o<Esc>^Da", opts)
-keymap.set("n", "<Leader>O", "O<Esc>^Da", opts)
+keymap.set("n", "<Leader>o", "o<Esc>^Da", { noremap = true, silent = true, desc = "Add new line below" })
+keymap.set("n", "<Leader>O", "O<Esc>^Da", { noremap = true, silent = true, desc = "Add new line above" })
 
 -- H move to head of line, L move to end of line
-keymap.set("n", "H", "^", opts)
-keymap.set("n", "L", "$", opts)
+keymap.set("n", "H", "^", { noremap = true, silent = true, desc = "Go to first non-blank char" })
+keymap.set("n", "L", "$", { noremap = true, silent = true, desc = "Go to end of line" })
 
 -- 窗口切换
 keymap.set("n", "<leader>ww", "<C-w>w", { desc = "focus windows" })
@@ -40,10 +40,10 @@ keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height" 
 
 -- emacs keymap
 -- 插入, 命令行模式：Emacs 基础移动（保留补全）
-vim.keymap.set({ "c", "i" }, "<C-a>", "<Home>", { noremap = true, silent = true })
-vim.keymap.set({ "c", "i" }, "<C-e>", "<End>", { noremap = true, silent = true })
-vim.keymap.set({ "c", "i" }, "<C-b>", "<Left>", { noremap = true, silent = true })
-vim.keymap.set({ "c", "i" }, "<C-f>", "<Right>", { noremap = true, silent = true })
+vim.keymap.set({ "c", "i" }, "<C-a>", "<Home>", { noremap = true, silent = true, desc = "Move to beginning of line" })
+vim.keymap.set({ "c", "i" }, "<C-e>", "<End>", { noremap = true, silent = true, desc = "Move to end of line" })
+vim.keymap.set({ "c", "i" }, "<C-b>", "<Left>", { noremap = true, silent = true, desc = "Move left" })
+vim.keymap.set({ "c", "i" }, "<C-f>", "<Right>", { noremap = true, silent = true, desc = "Move right" })
 
 -- LSP 快捷键
 -- keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition' })

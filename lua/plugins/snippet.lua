@@ -18,17 +18,17 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
 
         local luasnip = require("luasnip")
 
-        vim.keymap.set({ "i", "s" }, "<C-j>", function() luasnip.expand_or_jump() end, { silent = true })
-        vim.keymap.set({ "i", "s" }, "<C-k>", function() luasnip.jump(-1) end, { silent = true })
+        vim.keymap.set({ "i", "s" }, "<C-j>", function() luasnip.expand_or_jump() end, { silent = true, desc = "Expand or jump forward" })
+        vim.keymap.set({ "i", "s" }, "<C-k>", function() luasnip.jump(-1) end, { silent = true, desc = "Jump backward" })
         vim.keymap.set({ "i", "s" }, "<C-l>", function()
             if luasnip.choice_active() then
                 luasnip.change_choice(1)
             end
-        end, { silent = true })
+        end, { silent = true, desc = "Next choice" })
         vim.keymap.set({ "i", "s" }, "<C-h>", function()
             if luasnip.choice_active() then
                 luasnip.change_choice(-1)
             end
-        end, { silent = true })
+        end, { silent = true, desc = "Previous choice" })
     end
 })
