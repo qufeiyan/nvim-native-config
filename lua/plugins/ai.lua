@@ -24,7 +24,9 @@ local function copilot_setup()
             },
         },
         suggestion = {
-            enabled = true,
+            -- 关闭 inline ghost text：<Tab> 留给 blink 的 sidekick NES → snippet → blink 链。
+            -- 补全菜单仍由 blink-copilot（官方 copilot-language-server）提供。
+            enabled = false,
             auto_trigger = true,
             hide_during_completion = true,
             debounce = 15,

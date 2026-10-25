@@ -91,13 +91,13 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                 ["<C-d>"] = { "scroll_documentation_down", "fallback" },
                 ["<Tab>"] = {
                     function(cmp)
-                        if vim.b[vim.api.nvim_get_current_buf()].nes_state then
+                        -- 1) sidekick NES: 跳到 / 应用下一个编辑建议（没有 pending 时安全返回 false）
+                        local ok, sk = pcall(require, "sidekick")
+                        if ok and sk.nes_jump_or_apply() then
                             cmp.hide()
-                            return (
-                                require("copilot-lsp.nes").apply_pending_nes()
-                                and require("copilot-lsp.nes").walk_cursor_end_edit()
-                            )
+                            return true
                         end
+                        -- 2) snippet 已激活 → 接受 / 前进占位符
                         if cmp.snippet_active() then
                             return cmp.accept()
                         else

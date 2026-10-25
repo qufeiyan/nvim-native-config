@@ -4,7 +4,7 @@
 vim.pack.add({
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     { src = "https://github.com/windwp/nvim-autopairs" }, -- 括号匹配
-    { src = "https://github.com/folke/which-key.nvim" },
+
     -- { src = 'https://github.com/folke/snacks.nvim' },
     { src = "https://github.com/rachartier/tiny-inline-diagnostic.nvim" },
     { src = "https://github.com/MunifTanjim/nui.nvim" },
@@ -300,37 +300,4 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
             require("todo-comments").jump_prev({ keywords = { "TODO", "FIXME", "HACK" } })
         end, { desc = "Previous todo comment" })
     end,
-})
-
-local wk = require("which-key")
-wk.setup({
-    preset = "helix",
-    -- preset = "modern"
-    -- preset = "classic"
-})
-wk.add({
-    { "<leader>f", group = "file" }, -- group
-    { "<leader>l", group = "lsp" }, -- group
-    { "<leader>s", group = "auto session" }, -- group
-    { "<leader>a", group = "avante" }, -- group
-    { "<leader>r", group = "overseer" }, -- group
-    { "<leader>g", group = "git" }, -- group
-    -- { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find File", mode = "n" },
-    -- { "<leader>f1", hidden = true },                   -- hide this keymap
-    -- { "<leader>w",  proxy = "<c-w>",               group = "windows" },   -- proxy to window mappings
-    {
-        "<leader>b",
-        group = "buffers",
-        expand = function()
-            return require("which-key.extras").expand.buf()
-        end,
-    },
-    {
-        -- Nested mappings are allowed and can be added in any order
-        -- Most attributes can be inherited or overridden on any level
-        -- There's no limit to the depth of nesting
-        mode = { "n", "v" }, -- NORMAL and VISUAL mode
-        { "<leader>q", "<cmd>q<cr>", desc = "Quit" }, -- no need to specify mode since it's inherited
-        { "<leader>w", "<cmd>w<cr>", desc = "Write" },
-    },
 })
