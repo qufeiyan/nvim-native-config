@@ -157,6 +157,7 @@ end
 -- Test Framework
 -- ============================================================
 local failures = {} ---@type string[]
+local n_total = 0
 
 local function assert_eq(got, expected, msg)
   if got ~= expected then
@@ -179,6 +180,7 @@ end
 ---@param name string
 ---@param fn fun()
 local function test(name, fn)
+  n_total = n_total + 1
   snacks_terminal._calls = {}
   local ok, err = pcall(fn)
   if ok then
@@ -855,10 +857,80 @@ test("toggle_position() opts.position is updated correctly", function()
 end)
 
 -- ============================================================
+-- Suite 8: Fullscreen (new tab)
+-- ============================================================
+suite("Fullscreen")
+
+test("fullscreen() with no active terminal -> no-op", function()
+    local term = reload()
+    term.fullscreen()
+    -- no crash = pass
+end)
+
+test("fullscreen() zooms active terminal, preserving buffer and home position", function()
+    local term = reload()
+    term.create()                          -- #1 bottom, active=#1
+    local all = snacks_terminal.list()
+    local buf_before = all[1].buf
+
+    term.fullscreen()
+
+    all = snacks_terminal.list()
+    assert_eq(#all, 1, "still one terminal")
+    assert_eq(all[1].buf, buf_before, "same buffer preserved")
+    assert_truthy(all[1]:win_valid(), "visible after fullscreen")
+    assert_truthy(all[1]._zoomed, "zoomed flag set")
+    assert_eq(all[1].opts.position, "bottom", "home position preserved (bottom)")
+end)
+
+test("fullscreen() again returns to previous split", function()
+    local term = reload()
+    term.create()                          -- #1 bottom, active=#1
+    term.fullscreen()                      -- zoom in
+
+    local all = snacks_terminal.list()
+    assert_truthy(all[1]._zoomed, "zoomed after 1st call")
+
+    term.fullscreen()                      -- zoom out
+
+    all = snacks_terminal.list()
+    assert_falsy(all[1]._zoomed, "un-zoomed after 2nd call")
+    assert_eq(all[1].opts.position, "bottom", "position restored to bottom")
+    assert_truthy(all[1]:win_valid(), "visible after un-zoom")
+end)
+
+test("fullscreen() preserves buffer across multiple zooms", function()
+    local term = reload()
+    term.create()
+    local all = snacks_terminal.list()
+    local buf = all[1].buf
+
+    for _ = 1, 5 do term.fullscreen() end
+
+    all = snacks_terminal.list()
+    assert_eq(all[1].buf, buf, "same buffer after 5 fullscreen toggles")
+end)
+
+test("fullscreen() on a float terminal returns to float", function()
+    local term = reload()
+    term.create()                          -- #1 bottom, active=#1
+    term.toggle_position()                 -- -> float
+    term.fullscreen()                      -- zoom float into tab
+
+    local all = snacks_terminal.list()
+    assert_truthy(all[1]._zoomed, "zoomed")
+    assert_eq(all[1].opts.position, "float", "home position preserved (float)")
+
+    term.fullscreen()                      -- un-zoom
+    all = snacks_terminal.list()
+    assert_falsy(all[1]._zoomed, "un-zoomed")
+    assert_eq(all[1].opts.position, "float", "restored to float")
+end)
+
+-- ============================================================
 -- Summary
 -- ============================================================
 local n_failed = #failures
-local n_total = 3 + 13 + 6 + 7 + 3 + 25 + 9
 
 print(string.format("\n%s %d passed, %d failed",
   n_failed == 0 and "All tests passed:" or "Results:", n_total - n_failed, n_failed))

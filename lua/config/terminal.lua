@@ -6,6 +6,8 @@
 ---  - `<C-t>h/l` cycles through ALL terminals (bottom + float), so you can
 ---    switch from a float to a bottom terminal and vice versa.
 ---  - `toggle()` hides everything; pressing again restores the last bottom terminal.
+---  - `fullscreen()` zooms the active terminal into a new fullscreen tab
+---    (`<leader>tf` / `<C-t>f`); pressing it again returns to the previous split.
 local M = {}
 
 ---@type snacks.win? currently visible terminal (bottom or float)
@@ -194,6 +196,59 @@ function M.toggle_position()
         term:focus()
         M.setup_buf_keymaps(term.buf)
     end
+end
+
+---Resolve the terminal to operate on: the one under the cursor if the current
+---buffer is a terminal, otherwise the last active terminal.
+---@return snacks.win?
+local function current_terminal()
+    local buf = vim.api.nvim_get_current_buf()
+    local info = vim.b[buf].snacks_terminal
+    if info and info.id then
+        local t = get(info.id)
+        if t then
+            return t
+        end
+    end
+    return active
+end
+
+---Zoom the active terminal into a new fullscreen tab.
+---Calling it again returns the terminal to its previous split (bottom/float).
+---The terminal process and buffer are preserved across the zoom.
+function M.fullscreen()
+    local term = current_terminal()
+    if not term or not term:buf_valid() then
+        return
+    end
+
+    active = term
+    last_active_id = tid_of(term)
+
+    if term._zoomed then
+        -- Return to the previous split position.
+        local home = term._home_position or "bottom"
+        term._zoomed = nil
+        term._home_position = nil
+        term:hide()
+        term.opts.position = home
+        term:show()
+        term:focus()
+        M.setup_buf_keymaps(term.buf)
+        return
+    end
+
+    -- Zoom into a new fullscreen tab.
+    term._home_position = term.opts.position or "bottom"
+    term._zoomed = true
+    term:hide()
+    vim.cmd("tabnew")
+    term.opts.position = "current"
+    term:show()
+    -- Restore the "home" position so a later hide/show returns to the split.
+    term.opts.position = term._home_position
+    term:focus()
+    M.setup_buf_keymaps(term.buf)
 end
 
 ---Create a new bottom terminal with the next free index.
@@ -406,11 +461,19 @@ end
 
 ---Setup terminal global keymaps and autocommands. Call once from init.lua.
 function M.setup()
-    -- Helper: stopinsert before running action if called from terminal mode
+    -- Helper: if invoked from terminal (insert) mode, escape to terminal-normal
+    -- first so the action runs in normal-mode context. :stopinsert is a no-op in
+    -- terminal mode, so use the termwinkey escape <C-\><C-n> instead.
     local function t(fn)
         return function()
             if vim.fn.mode() == "t" then
-                vim.cmd.stopinsert()
+                vim.api.nvim_feedkeys(
+                    vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true),
+                    "n",
+                    false
+                )
+                vim.schedule(fn)
+                return
             end
             fn()
         end
@@ -421,6 +484,7 @@ function M.setup()
     vim.keymap.set("n", "<leader>tt", M.toggle, { desc = "Toggle terminal" })
     vim.keymap.set("n", "<leader>tn", M.create, { desc = "New terminal" })
     vim.keymap.set("n", "<leader>tr", M.toggle_position, { desc = "Toggle terminal position" })
+    vim.keymap.set("n", "<leader>tf", M.fullscreen, { desc = "Fullscreen terminal (new tab)" })
     vim.keymap.set("n", "<leader>th", M.switch_prev, { desc = "Previous terminal" })
     vim.keymap.set("n", "<leader>tl", M.switch_next, { desc = "Next terminal" })
     vim.keymap.set("n", "<leader>td", M.delete, { desc = "Delete terminal" })
@@ -439,6 +503,7 @@ function M.setup()
     vim.keymap.set("t", "<C-t>t", t(M.toggle), { desc = "Toggle terminal" })
     vim.keymap.set("t", "<C-t>n", t(M.create), { desc = "New terminal" })
     vim.keymap.set("t", "<C-t>r", t(M.toggle_position), { desc = "Toggle terminal position" })
+    vim.keymap.set("t", "<C-t>f", t(M.fullscreen), { desc = "Fullscreen terminal (new tab)" })
     vim.keymap.set("t", "<C-t>h", t(M.switch_prev), { desc = "Previous terminal" })
     vim.keymap.set("t", "<C-t>l", t(M.switch_next), { desc = "Next terminal" })
     vim.keymap.set("t", "<C-t>d", t(M.delete), { desc = "Delete terminal" })
