@@ -2,6 +2,31 @@ vim.pack.add({
     { src = "https://github.com//lewis6991/gitsigns.nvim" },
 })
 
+-- codediff.nvim: VSCode 风格并排/内联 diff review（配合 lazygit 的 E 键跳转）
+-- 显式 load=false 只加 rtp 不 source plugin/，首次调用时再 packadd 按需加载
+vim.pack.add({
+    { src = "https://github.com/esmuellert/codediff.nvim" },
+}, { load = false })
+
+local codediff_ready = false
+--- 首次使用时 source 插件 plugin/ 使 :CodeDiff 可用
+---@param args? string 追加到 :CodeDiff 的参数，如 "history"
+local function open_codediff(args)
+    if not codediff_ready then
+        -- 若尚未安装(vim.pack 首启会提示安装)，packadd 会失败，保留重试
+        codediff_ready = pcall(vim.cmd.packadd, "codediff.nvim")
+    end
+    vim.cmd("CodeDiff" .. (args and (" " .. args) or ""))
+end
+
+-- 默认 diff.layout 即为 "side-by-side"，无需额外 setup
+vim.keymap.set("n", "<leader>gv", function()
+    open_codediff()
+end, { desc = "Review changes (CodeDiff)" })
+vim.keymap.set("n", "<leader>gV", function()
+    open_codediff("history")
+end, { desc = "Review history (CodeDiff)" })
+
 vim.api.nvim_create_autocmd("BufReadPost", {
     once = true,
     callback = function()

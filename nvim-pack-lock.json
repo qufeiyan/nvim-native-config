@@ -37,6 +37,10 @@
       "rev": "274b2c69ea17d7f417999b132d81d63eb2cdb73f",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
+    "codediff.nvim": {
+      "rev": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e",
+      "src": "https://github.com/esmuellert/codediff.nvim"
+    },
     "copilot-lsp": {
       "rev": "1b6d8273594643f51bb4c0c1d819bdb21b42159d",
       "src": "https://github.com/copilotlsp-nvim/copilot-lsp.git"
