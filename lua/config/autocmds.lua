@@ -4,20 +4,20 @@
 vim.api.nvim_create_autocmd("BufReadPost", {
     once = true,
     callback = function()
-        vim.lsp.config('lua_ls', {
+        vim.lsp.config("lua_ls", {
             settings = {
                 Lua = {
-                    runtime = { version = 'LuaJIT', path = vim.split(package.path, ';') }, -- Lua 运行时
-                    diagnostics = { globals = { 'vim' } },                                 -- 忽略全局变量 vim 的警告
+                    runtime = { version = "LuaJIT", path = vim.split(package.path, ";") }, -- Lua 运行时
+                    diagnostics = { globals = { "vim" } }, -- 忽略全局变量 vim 的警告
                     workspace = {
-                        library = vim.api.nvim_get_runtime_file('', true),
+                        library = vim.api.nvim_get_runtime_file("", true),
                         checkThirdParty = false,
                     },
                     format = { enable = true }, -- 启用格式化
                 },
             },
         })
-    end
+    end,
 })
 
 -- Trim whitespace
@@ -34,14 +34,14 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 })
 
 -- 保存前自动格式化
-vim.api.nvim_create_autocmd('BufWritePre', {
+vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function()
         local ft = vim.bo.filetype
-        if ft == 'lua' then
+        if ft == "lua" then
             vim.lsp.buf.format()
         end
     end,
-    pattern = '*',
+    pattern = "*",
 })
 
 -- vim.api.nvim_create_autocmd("VimEnter", {
@@ -57,17 +57,17 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 -- })
 
 -- 复制高亮提示
-vim.api.nvim_create_autocmd('TextYankPost', {
-    desc = 'highlight copying text',
-    group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
+vim.api.nvim_create_autocmd("TextYankPost", {
+    desc = "highlight copying text",
+    group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
     callback = function()
         vim.highlight.on_yank({ timeout = 200 })
     end,
 })
 
 -- Restore cursor position
-vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
-    pattern = { '*' },
+vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+    pattern = { "*" },
     callback = function()
         if vim.bo.filetype == "snacks_dashboard" then
             return
@@ -75,8 +75,6 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
         vim.api.nvim_exec2('silent! normal! g`"zv', { output = false })
     end,
 })
-
-
 
 local reset_overseerlist_width = function()
     for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -89,11 +87,11 @@ local reset_overseerlist_width = function()
         end
     end
 end
-vim.api.nvim_create_autocmd('VimResized', {
-    pattern = '*',
+vim.api.nvim_create_autocmd("VimResized", {
+    pattern = "*",
     callback = function()
         -- File buffers
-        vim.cmd 'wincmd =' -- Equalize window sizes
+        vim.cmd("wincmd =") -- Equalize window sizes
 
         -- DAP UI
         -- custom_utils.func_on_window('dapui_stacks', function()
@@ -109,5 +107,39 @@ vim.api.nvim_create_autocmd("FileType", {
     pattern = "*",
     callback = function()
         vim.opt.formatoptions:remove({ "r", "o" })
-    end
+    end,
 })
+
+-- Restart nvim: force-stop all LSP clients first, then delegate to native :restart.
+local function nvim_restart()
+    -- Refuse to restart if any file buffer has unsaved changes.
+    local unsaved = {}
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(buf) then
+            local buftype = vim.api.nvim_get_option_value("buftype", { buf = buf })
+            local modified = vim.api.nvim_get_option_value("modified", { buf = buf })
+            if buftype == "" and modified then
+                local name = vim.api.nvim_buf_get_name(buf)
+                table.insert(unsaved, name ~= "" and name or "[No Name]")
+            end
+        end
+    end
+    if #unsaved > 0 then
+        vim.notify("有未保存的更改，已取消重启：\n" .. table.concat(unsaved, "\n"), vim.log.levels.WARN)
+        return
+    end
+
+    -- Force-stop all LSP clients so they can't block the restart.
+    for _, client in ipairs(vim.lsp.get_clients()) do
+        client:stop(true)
+    end
+    -- Native :restart stops nvim, starts a new server, and reattaches all UIs.
+    vim.cmd("restart")
+end
+
+vim.api.nvim_create_user_command("Restart", nvim_restart, {
+    desc = "Force-stop all LSP clients and restart nvim",
+})
+
+-- Typing :restart now routes through the custom :Restart (LSP stop + unsaved check first).
+vim.cmd([[cabbrev restart Restart]])
