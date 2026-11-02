@@ -108,7 +108,13 @@ Not a bug, but a feature!
     },
     image = {
         enabled = true,
-        doc = { enabled = true, inline = true, float = false, max_width = 80, max_height = 20 },
+        doc = {
+            enabled = true,
+            inline = not vim.env.ZELLIJ_SESSION_NAME,
+            float = true,
+            max_width = 80,
+            max_height = 20,
+        },
     },
     indent = {
         enabled = true,
@@ -158,6 +164,24 @@ Not a bug, but a feature!
         },
     },
 })
+
+-- zellij 启动时对 CSI 14t / 16t 的应答有竞态（zellij-org/zellij#5164，0.45.1 未修）：
+-- 一旦和 pane 内程序的 host-query 转发撞上，应答会被混进转发槽，session 的
+-- character_cell_size 就一直是 None，之后所有 kitty 图形显示命令都会返回
+-- `ENOTSUPPORTED: cell size unknown`。这里主动补发一次 CSI 16t：
+-- zellij 转发给真实终端后会把 cell size 写进 session，并缓存应答后续查询。
+-- 回包是 CSI 6;h;wt，nvim 会当作未知 CSI 丢弃，不会污染 buffer。
+if vim.env.ZELLIJ_SESSION_NAME then
+    local function query_cell_size()
+        pcall(vim.api.nvim_ui_send, "\27[16t")
+    end
+    vim.defer_fn(query_cell_size, 200)
+    vim.api.nvim_create_autocmd("VimResized", {
+        group = vim.api.nvim_create_augroup("snacks.image.cell_size", { clear = true }),
+        callback = query_cell_size,
+    })
+end
+
 local map = function(key, func, opts)
     vim.keymap.set({ "n", "v" }, key, func, opts)
 end
@@ -434,3 +458,20 @@ map("<leader>fu", Snacks.picker.undo, { desc = "Find undo history" })
 map("<leader>fq", Snacks.picker.qflist, { desc = "Quickfix List" })
 
 vim.keymap.set("n", "<leader>gg", "<cmd>lua Snacks.lazygit()<CR>", { desc = "Open lazygit" })
+
+-- zellij 启动时对 CSI 14t / 16t 的应答有竞态（zellij-org/zellij#5164，0.45.1 未修）：
+-- 一旦和 pane 内程序的 host-query 转发撞上，应答会被混进转发槽，session 的
+-- character_cell_size 就一直是 None，之后所有 kitty 图形显示命令都会返回
+-- `ENOTSUPPORTED: cell size unknown`。这里主动补发一次 CSI 16t：
+-- zellij 转发给真实终端后会把 cell size 写进 session，并缓存应答后续查询。
+-- 回包是 CSI 6;h;wt，nvim 会当作未知 CSI 丢弃，不会污染 buffer。
+if vim.env.ZELLIJ_SESSION_NAME then
+    local function query_cell_size()
+        pcall(vim.api.nvim_ui_send, "\27[16t")
+    end
+    vim.defer_fn(query_cell_size, 200)
+    vim.api.nvim_create_autocmd("VimResized", {
+        group = vim.api.nvim_create_augroup("snacks.image.cell_size", { clear = true }),
+        callback = query_cell_size,
+    })
+end

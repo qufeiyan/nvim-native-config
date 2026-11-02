@@ -18,15 +18,14 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- vim.pack.add({
---     { src = "https://github.com/HakonHarnes/img-clip.nvim" },
--- })
-
 vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("SetupImgClip", { clear = true }),
     pattern = { "typst", "tex", "markdown" },
     once = true,
     callback = function()
+        vim.pack.add({
+            { src = "https://github.com/HakonHarnes/img-clip.nvim" },
+        })
         require("img-clip").setup({
             default = {
                 dir_path = "./assets",
