@@ -25,9 +25,13 @@ require("sidekick").setup({
             layout = "right",
             split = { width = 80 },
             keys = {
-                -- `q` 只在 normal 模式生效，需先 `<c-q>`(stopinsert) 退出终端模式才能按；
+                -- `q` 只在 normal 模式生效，需先退出终端模式（内置 `<c-\><c-n>`）再按；
                 -- 终端模式下直接关窗口用 `<c-.>`，退回上个窗口用 `<c-z>`。
+                -- `stopinsert = false`：禁用默认的 `<c-q>` stopinsert（终端模式），
+                -- 让 `<c-q>` 直达 opencode —— 被 scroll-mode 插件用作滚动/编辑模式切换键；
+                -- 退出终端模式请用内置 `<c-\><c-n>`。
                 hide_n = { "q", "hide", mode = "n", desc = "hide the terminal window" },
+                stopinsert = false,
             },
         },
         -- Persist CLI sessions so they survive leaving the terminal window.

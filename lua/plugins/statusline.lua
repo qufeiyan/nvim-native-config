@@ -28,6 +28,9 @@ local function statusline_setup()
         end,
     })
 
+    -- sidekick: 已连接的 CLI 会话（tmux / zellij 里仍在跑的 AI 工具）
+    vim.api.nvim_set_hl(0, "SidekickCLI", { fg = "#b8bb26", italic = true })
+
     local sl = require("mini.statusline")
     sl.setup({
         content = {
@@ -42,6 +45,30 @@ local function statusline_setup()
                 local fileinfo = sl.section_fileinfo({ trunc_width = 120 })
                 -- local location = sl.section_location({ trunc_width = 75 })
                 local search = sl.section_searchcount({ trunc_width = 75 })
+
+                -- sidekick: 已连接的 CLI 会话（tmux / zellij 里仍在跑的 AI 工具）
+                local function section_sidekick_cli(args)
+                    if sl.is_truncated(args.trunc_width) then
+                        return ""
+                    end
+                    local ok, sessions = pcall(function()
+                        return require("sidekick.status").cli()
+                    end)
+                    if not ok or #sessions == 0 then
+                        return ""
+                    end
+                    local seen, names = {}, {}
+                    for _, session in ipairs(sessions) do
+                        if not seen[session.tool] then
+                            seen[session.tool] = true
+                            table.insert(names, session.tool)
+                        end
+                    end
+                    table.sort(names)
+                    return "󰚩 " .. table.concat(names, ",")
+                end
+                local sidekick_cli = section_sidekick_cli({ trunc_width = 80 })
+
                 local section_filename = function(args)
                     -- In terminal always use plain name
                     if vim.bo.buftype == "terminal" then
@@ -209,6 +236,7 @@ local function statusline_setup()
                 return sl.combine_groups({
                     { hl = mode_hl, strings = { mode } },
                     { hl = "MiniStatuslineDevinfo", strings = { git, diff, diagnostics } },
+                    { hl = "SidekickCLI", strings = { sidekick_cli } },
                     { hl = "CopilotInfo", strings = { copilot or "" } },
                     "%<", -- Mark general truncate point
                     { hl = "MiniStatuslineFilename", strings = { filename } },

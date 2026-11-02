@@ -393,35 +393,95 @@ vim.api.nvim_create_autocmd("VimEnter", {
     once = true,
     callback = function()
         vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+        -- sidekick CLI sessions live in a tmux/zellij session and are shown in a
+        -- Neovim terminal (`zellij attach` / `tmux attach`). Those terminals can't
+        -- be restored by `:mksession`, so we close them on save and re-attach the
+        -- underlying mux session after restore.
+        local sidekick_restore = {}
+
         require("auto-session").setup({
-            options = {
-                -- The following are already the default values, no need to provide them if these are already the settings you want.
-                session_lens = {
-                    picker = "snacks", -- "telescope"|"snacks"|"fzf"|"select"|nil Pickers are detected automatically but you can also manually choose one. Falls back to vim.ui.select
-                    mappings = {
-                        -- Mode can be a string or a table, e.g. {"i", "n"} for both insert and normal mode
-                        delete_session = { "i", "<C-d>" },
-                        alternate_session = { "i", "<C-s>" },
-                        copy_session = { "i", "<C-y>" },
-                    },
-
-                    picker_opts = {
-                        -- For Snacks, you can set layout options here, see:
-                        -- https://github.com/folke/snacks.nvim/blob/main/docs/picker.md#%EF%B8%8F-layouts
-                        --
-                        preset = "dropdown",
-                        preview = false,
-                        layout = {
-                            width = 0.4,
-                            height = 0.4,
-                        },
-                    },
-
-                    -- Telescope only: If load_on_setup is false, make sure you use `:AutoSession search` to open the picker as it will initialize everything first
-                    load_on_setup = true,
+            -- The following are already the default values, no need to provide them if these are already the settings you want.
+            session_lens = {
+                picker = "snacks", -- "telescope"|"snacks"|"fzf"|"select"|nil Pickers are detected automatically but you can also manually choose one. Falls back to vim.ui.select
+                mappings = {
+                    -- Mode can be a string or a table, e.g. {"i", "n"} for both insert and normal mode
+                    delete_session = { "i", "<C-d>" },
+                    alternate_session = { "i", "<C-s>" },
+                    copy_session = { "i", "<C-y>" },
                 },
-                auto_restore_last_session = true,
-                suppressed_dirs = { "~/", "~/Dev", "~/Documents", "~/Desktop", "~/Projects", "~/Downloads", "/" },
+
+                picker_opts = {
+                    -- For Snacks, you can set layout options here, see:
+                    -- https://github.com/folke/snacks.nvim/blob/main/docs/picker.md#%EF%B8%8F-layouts
+                    --
+                    preset = "dropdown",
+                    preview = false,
+                    layout = {
+                        width = 0.4,
+                        height = 0.4,
+                    },
+                },
+
+                -- Telescope only: If load_on_setup is false, make sure you use `:AutoSession search` to open the picker as it will initialize everything first
+                load_on_setup = true,
+            },
+            auto_restore_last_session = true,
+            suppressed_dirs = { "~/", "~/Dev", "~/Documents", "~/Desktop", "~/Projects", "~/Downloads", "/" },
+
+            -- Record the attached sidekick CLI sessions, then close their
+            -- terminal buffers so `:mksession` doesn't save them as dead terminals.
+            pre_save_cmds = {
+                function()
+                    sidekick_restore = {}
+                    local ok, Session = pcall(require, "sidekick.cli.session")
+                    if ok then
+                        for _, s in pairs(Session.attached()) do
+                            sidekick_restore[#sidekick_restore + 1] = {
+                                tool = s.tool.name,
+                                cwd = s.cwd,
+                                backend = s.mux_backend,
+                            }
+                        end
+                    end
+                    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                        if vim.bo[buf].filetype == "sidekick_terminal" then
+                            vim.api.nvim_buf_delete(buf, { force = true })
+                        end
+                    end
+                end,
+            },
+            -- Persist which sessions to re-attach, alongside the session itself.
+            save_extra_data = function()
+                if #sidekick_restore == 0 then
+                    return nil
+                end
+                -- Wrap in an object so the JSON ends with `}` instead of `]`.
+                -- auto-session escapes this with a `[[...]]` long string, and a
+                -- trailing `]` (from a bare JSON array) would collide with the
+                -- closing `]]` and break the generated `:lua` line.
+                return vim.json.encode({ sidekick = sidekick_restore })
+            end,
+            restore_extra_data = function(_, data)
+                local ok, decoded = pcall(vim.json.decode, data)
+                sidekick_restore = (ok and decoded and decoded.sidekick) or {}
+            end,
+            -- Re-attach the CLI sessions after the session is fully restored.
+            post_restore_cmds = {
+                function()
+                    if #sidekick_restore == 0 then
+                        return
+                    end
+                    local ok, Session = pcall(require, "sidekick.cli.session")
+                    if not ok then
+                        return
+                    end
+                    vim.schedule(function()
+                        Session.setup()
+                        for _, info in ipairs(sidekick_restore) do
+                            Session.attach(Session.new({ tool = info.tool, cwd = info.cwd, backend = info.backend }))
+                        end
+                    end)
+                end,
             },
         })
         vim.keymap.set("n", "<leader>sr", ":AutoSession search<CR>", { desc = "Session search" })
