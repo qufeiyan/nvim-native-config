@@ -81,7 +81,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
                     },
                 },
                 ghost_text = {
-                    enabled = false,
+                    enabled = true,
                     show_with_menu = true,
                 },
             },

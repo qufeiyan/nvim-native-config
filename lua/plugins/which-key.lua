@@ -48,7 +48,9 @@ wk.setup({
             { pattern = "terminal", icon = " ", color = "red" },
 
             -- ── Session ─────────────────────────────────────────────────
-            { pattern = "session", icon = " ", color = "azure" },
+            { pattern = "Toggle", icon = "󰔡 ", color = "azure" },
+            { pattern = "search", icon = " ", color = "azure" },
+            { pattern = "Save", icon = "󰳻 ", color = "azure" },
 
             -- ── Diagnostics（必须在 buffer 之前，否则 [d/]d 会误配 buffer 图标）──
             { pattern = "diagnostic", icon = "󱖫 ", color = "green" },

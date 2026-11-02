@@ -84,7 +84,7 @@ vim.opt.listchars = {
 }
 
 vim.opt.updatetime = 500 -- Lower than default (4000) to quickly trigger CursorHold
-vim.opt.timeoutlen = 300 -- Lower than default (1000) to quickly trigger which-key
+vim.opt.timeoutlen = 1000 -- Default; multi-key terminal-mode maps (<C-t>x) need the full window to register (which-key has its own `delay`)
 vim.opt.laststatus = 3   -- 启用全局状态栏
 -- vim.opt.splitkeep = "screen"
 
